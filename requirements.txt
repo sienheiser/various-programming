@@ -1,0 +1,5 @@
+These projects can be compiled and run using ghdl.
+Most of the directories will have test benches that are written in vhdl
+and python. To run the vhdl test bench use ghdl. To run the cocotb testbench 
+please install cocotb for python and follow instructions on how to create a makefile
+here https://docs.cocotb.org/en/stable/quickstart.html
