@@ -1,4 +1,0 @@
-v 4
-file "/home/mpssw/emmanuel_workspace/vhdl_toy_problems/02.rgb/" "rgb.vhdl" "a085f5f41929e1d4ca1efda6653b3f39a1841b8d" "20240530122015.100":
-  entity rgb at 1( 0) + 0 on 11;
-  architecture arch of rgb at 14( 247) + 0 on 12;

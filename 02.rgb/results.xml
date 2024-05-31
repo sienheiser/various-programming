@@ -1,6 +1,0 @@
-<testsuites name="results">
-  <testsuite name="all" package="all">
-    <property name="random_seed" value="1717071615" />
-    <testcase name="test1" classname="testbench" file="/home/mpssw/emmanuel_workspace/vhdl_toy_problems/02.rgb/testbench.py" lineno="6" time="0.0017900466918945312" sim_time_ns="8.000001" ratio_time="4469.157724334576" />
-  </testsuite>
-</testsuites>
