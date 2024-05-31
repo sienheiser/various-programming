@@ -1,1 +1,4 @@
 *.cf
+__pycache__
+*.xml
+sim_build
