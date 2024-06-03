@@ -18,6 +18,12 @@ begin
             case inp is
                 when "001" =>
                     enc <= S_OK;
+                when "010" =>
+                    enc <= S_BI;
+                when "100" =>
+                    enc <= S_RBI;
+                when "111" =>
+                    enc <= S_EBI;
                 when others =>
                     enc <= S_EBI;
             end case;
