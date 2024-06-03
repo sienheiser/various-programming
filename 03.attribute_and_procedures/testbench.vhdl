@@ -35,8 +35,26 @@ begin
     stimulus_process: process is
     begin
         inp_tb <= "001";
+        wait for 2 ns;
         assert enc_tb = S_OK report "Test Case 1 failed" severity error;
+        
+        inp_tb <= "010";
+        wait for 2 ns;
+        assert enc_tb = S_BI report "Test Case 2 failed" severity error;
 
+
+        inp_tb <= "100";
+        wait for 2 ns;
+        assert enc_tb = S_RBI report "Test Case 3 failed" severity error;
+
+
+        inp_tb <= "111";
+        wait for 2 ns;
+        assert enc_tb = S_EBI report "Test Case 4 failed" severity error;
+
+        inp_tb <= "110";
+        wait for 2 ns;
+        assert enc_tb = S_EBI report "Test Case 5 failed" severity error;
         wait;
     end process stimulus_process;
 end architecture behave;
