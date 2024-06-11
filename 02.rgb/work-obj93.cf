@@ -1,7 +1,0 @@
-v 4
-file . "rgb.vhdl" "a085f5f41929e1d4ca1efda6653b3f39a1841b8d" "20240530123622.864":
-  entity rgb at 1( 0) + 0 on 13;
-  architecture arch of rgb at 14( 247) + 0 on 14;
-file . "testbench.vhdl" "a1e0974380bfe1e2be4ecb17d1d422f14db1c1da" "20240530125033.201":
-  entity test_bench at 1( 0) + 0 on 25;
-  architecture behave of test_bench at 7( 89) + 0 on 26;
