@@ -4,8 +4,9 @@ TOPLEVEL_LANG ?= vhdl
 
 VHDL_SOURCES += ent.vhdl
 VHDL_SOURCES += pkg.vhdl
+VHDL_SOURCES += wrapper.vhdl
 
-TOPLEVEL = ent
+TOPLEVEL = wrapper
 
 MODULE = testbench
 
