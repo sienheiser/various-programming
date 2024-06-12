@@ -8,26 +8,41 @@ end entity testbench;
 
 architecture behave of testbench is
     signal clk_tb: std_logic;
-    signal inpa_tb: enc_t;
-    signal inpb_tb: enc_t;
-    signal outp_tb: enc_array_t(1 downto 0);
+    signal inp_tb: enc_array_t(1 downto 0);
+    signal outp_tb: std_logic_vector(3 downto 0);
+
+    signal inp_tb2: std_logic_vector(3 downto 0);
+    signal outp_tb2: enc_array_t(1 downto 0);
 
     component ent is 
     port(
         clk : in std_logic;
-        inpa : in enc_t;
-        inpb : in enc_t;
-        outp : out enc_array_t(1 downto 0)
+        inp : in enc_array_t(1 downto 0);
+        outp: out std_logic_vector(3 downto 0)
     );
     end component ent;
+
+    component ent2 is
+        port(
+            clk : in std_logic;
+            inp : in std_logic_vector(3 downto 0);
+            outp: out enc_array_t(1 downto 0)
+        );
+    end component ent2;
 
 begin
     ent_INST: ent 
     port map(
         clk => clk_tb,
-        inpa => inpa_tb,
-        inpb => inpb_tb,
+        inp => inp_tb,
         outp => outp_tb
+    );
+
+    ent2_INST: ent2
+    port map(
+        clk => clk_tb,
+        inp => inp_tb2,
+        outp => outp_tb2
     );
     
     clock:process
@@ -40,19 +55,26 @@ begin
         end loop;
     end process clock;
 
-    stimulus:process
+    stimulus1:process
     begin
-        inpa_tb <= Bye;
-        inpb_tb <= Bye;
+        inp_tb(0) <= Bye;
+        inp_tb(1) <= Bye;
         wait for 2 ns;
-        assert inpa_tb = Bye report "Test case 1" severity error;
-        assert inpb_tb = Bye report "Test case 2" severity error;
+        assert inp_tb(0) = Bye report "Test case 1" severity error;
+        assert inp_tb(1) = Bye report "Test case 2" severity error;
 
         wait for 2.1 ns;
-        assert outp_tb(0) = Bye report "Test case 3" severity error;
-        assert outp_tb(1) = Bye report "Test case 4" severity error;
-
-
+        assert outp_tb = "0101" report "Test case 3" severity error;
         wait;
-    end process stimulus;
+    end process stimulus1;
+
+    stimulus2:process
+    begin
+        inp_tb2 <= "0101";
+        wait for 2 ns;
+        wait for 2.1 ns;
+        assert outp_tb2(0) = Bye report "ent2 test case 1" severity error;
+        assert outp_tb2(1) = Bye report "ent2 test case 2" severity error;
+        wait;
+    end process stimulus2;
 end architecture behave;
