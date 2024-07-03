@@ -1,0 +1,33 @@
+# VHDL files
+VHDL_SOURCES := pkg.vhdl ent.vhdl testbench.vhdl 
+
+# Testbench entity name
+TESTBENCH := testbench
+
+# GHDL commands
+GHDL := ghdl 
+GHDL_ANALYZE := $(GHDL) -a
+GHDL_ELABORATE := $(GHDL) -e
+GHDL_RUN := $(GHDL) -r
+
+# Default target to analyze, elaborate, and run the simulation
+all: analyze elaborate run
+
+# Rule to analyze all VHDL files
+analyze: $(VHDL_SOURCES)
+	$(GHDL_ANALYZE) pkg.vhdl
+	$(GHDL_ANALYZE) ent.vhdl
+	$(GHDL_ANALYZE) testbench.vhdl
+
+# Rule to elaborate the testbench
+elaborate: analyze
+	$(GHDL_ELABORATE) $(TESTBENCH)
+
+# Rule to run the simulation
+run: elaborate
+	$(GHDL_RUN) $(TESTBENCH)
+
+# Clean rule
+.PHONY: clean
+clean:
+	rm -f work-obj93.cf $(TESTBENCH)
