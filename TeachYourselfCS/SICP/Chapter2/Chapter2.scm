@@ -211,6 +211,27 @@
          (= upper-res upper-exp))))
 
 
+
+(define test-int1 (make-interval 1 2))
+(define test-int2 (make-interval 3 4))
+;Exercise 2.8 define procedure sub-interval
+
+(define (sub-interval x y)
+  (make-interval (- (lower-bound x) (upper-bound y))
+                 (- (upper-bound x) (lower-bound y))))
+
+(define (test-sub-interval)
+  (define result (sub-interval test-int1 test-int2))
+  (let
+    ((lower-res (lower-bound result))
+     (upper-res (upper-bound result))
+     (lower-exp -3)
+     (upper-exp -1))
+    (and (= lower-res lower-exp)
+         (= upper-res upper-exp))))
+
+
+;Exercise 2.10 deal with division of interval over span of zero
 (define (div-interval x y)
   (if  (and (< (lower-bound y) 0) (> (upper-bound y) 0))
     (error "an interval spans zero")
@@ -218,8 +239,6 @@
                   (make-interval (/ 1.0 (upper-bound y))
                                  (/ 1.0 (lower-bound y))))))
 
-(define test-int1 (make-interval 1 2))
-(define test-int2 (make-interval 3 4))
 (define (test1-div-interval)
   (define test-int1 (make-interval 1 2))
   (define test-int2 (make-interval 3 4))
@@ -237,3 +256,51 @@
   (define test-int2 (make-interval -1 4))
   (div-interval test-int1 test-int2))
     
+
+;Exercise 2.11 Rewrite mul-interval in terms of 9 cases
+            
+
+;------------------------------------------------------
+
+(define (make-center-width c w)
+  (make-interval (- c w) (+ c w)))
+
+(define (center i)
+  (/ (+ (lower-bound i) (upper-bound i)) 2))
+
+(define (width i)
+  (/ (- (upper-bound i) (lower-bound i)) 2))
+
+(define (make-center-percent c p):w
+
+  (define ratio (/ p 100))
+  (let ((w (* c ratio)))
+    (make-interval (- c w) (+ c w))))
+
+(define (percent i)
+  (let
+    ((w (/ (- (upper-bound i) (lower-bound i)) 2)))
+    (* w 100)))
+
+;Exercise 2.12 make constructors that use percent
+(define (test-make-center-percent)
+  (define c 1.0)
+  (define p 50.0)
+  (define i (make-center-percent c p))
+  (let ((lower-res (lower-bound i))
+        (upper-res (upper-bound i))
+        (lower-exp 0.5)
+        (upper-exp 1.5))
+    (and (= lower-res lower-exp)
+         (= upper-res upper-exp))))
+
+(define (test-percent)
+  (define c 1.0)
+  (define p 50.0)
+  (define i (make-center-percent c p))
+  (let ((p-res (percent i))
+        (p-exp p))
+    (= p-res p-exp)))
+
+;------------------------------------------------
+
