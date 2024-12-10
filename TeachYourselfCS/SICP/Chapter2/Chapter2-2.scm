@@ -61,3 +61,21 @@
   (if (null? xs)
     0
     (+ 1 (lengthh (cdr xs)))))
+
+
+
+(define (count-leaves xs)
+  (cond ((null? xs) 0)
+        ((not (pair? xs) 1))
+        (else (+ (count-leaves (car xs)) 
+                 (count-leaves (cdr xs))))))
+
+;Exercise 2.27 deep-reverse
+;(deep-reverse ((1 2) (3 4))) = ((4 3) (2 1))
+
+(define (deep-reverse xs)
+  (define (iter ys zs)
+    (cond ((null? ys) zs)
+          ((not (pair? (car ys))) (iter (cdr ys) (cons (car ys) zs)))
+          (else (iter (cdr ys) (cons (iter (car ys) null) zs)))))
+  (iter xs null))
