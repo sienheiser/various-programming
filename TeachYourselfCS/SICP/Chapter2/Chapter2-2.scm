@@ -52,6 +52,6 @@
 
 ;Exercise 2.23 for-each
 (define (for-each proc xs)
-  (if null? xs)
-  (proc xs)
-  (for-each proc (cdr xs)))
+  (unless (null? xs)
+    (proc (car xs))
+    (for-each proc (cdr xs))))
