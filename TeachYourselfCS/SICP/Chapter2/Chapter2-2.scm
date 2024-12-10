@@ -55,3 +55,9 @@
   (unless (null? xs)
     (proc (car xs))
     (for-each proc (cdr xs))))
+;----------------------------------------
+
+(define (lengthh xs)
+  (if (null? xs)
+    0
+    (+ 1 (lengthh (cdr xs)))))
