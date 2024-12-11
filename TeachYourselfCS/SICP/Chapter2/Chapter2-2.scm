@@ -79,3 +79,33 @@
           ((not (pair? (car ys))) (iter (cdr ys) (cons (car ys) zs)))
           (else (iter (cdr ys) (cons (iter (car ys) null) zs)))))
   (iter xs null))
+
+;Exercise 2.28 fringe
+; (fringe ((list 1 2) 3 4)) = (1 2 3 4)
+(define (fringe xs)
+  (cond ((null? xs) null)
+        ((not (pair? (car xs))) (cons (car xs) (fringe (cdr xs))))
+        (else (fringe (append (car xs) (cdr xs))))))
+
+
+;Exercise 2.29 Binary-Mobile 
+(define (make-mobile left right)
+  (list left right))
+(define (make-branch length structure)
+  (list length structure))
+
+;Exercise 2.29.a selectors
+(define (select-left-branch bm)(car bm))
+(define (select-right-branch bm)(cdr bm))
+(define (select-branch-length) b (car b))
+(define (select-branch-structure) b (cdr b))
+
+;Exercise 2.29.b total-weight of a binary mobile 
+(define (total-weight bm)
+  (cond ((null? bm) 0)
+        ((not (pair? bm)) (select-branch-structure))
+        (else (+ (total-weight (select-left-branch bm))
+                 (total-weight (select-right-branch bm))))))
+
+(define (test-mobile)
+  (make-mobile 5 5))
