@@ -91,21 +91,24 @@
 ;Exercise 2.29 Binary-Mobile 
 (define (make-mobile left right)
   (list left right))
-(define (make-branch length structure)
-  (list length structure))
+(define (make-branch len structure)
+  (list len structure))
 
 ;Exercise 2.29.a selectors
 (define (select-left-branch bm)(car bm))
-(define (select-right-branch bm)(cdr bm))
-(define (select-branch-length) b (car b))
-(define (select-branch-structure) b (cdr b))
+(define (select-right-branch bm)(car (cdr bm)))
+(define (select-branch-length b) (car b))
+(define (select-branch-structure b) (car (cdr b)))
 
 ;Exercise 2.29.b total-weight of a binary mobile 
 (define (total-weight bm)
   (cond ((null? bm) 0)
-        ((not (pair? bm)) (select-branch-structure))
+        ((not (pair? (car bm))) (select-branch-structure bm))
         (else (+ (total-weight (select-left-branch bm))
                  (total-weight (select-right-branch bm))))))
 
-(define (test-mobile)
-  (make-mobile 5 5))
+(define test-mobile
+  (make-mobile (make-branch 5 10) 
+               (make-mobile (make-branch 5 10) (make-branch 5 10))))
+
+;Exercise 2.29.c 
