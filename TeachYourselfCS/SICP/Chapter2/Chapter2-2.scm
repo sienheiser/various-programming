@@ -111,4 +111,78 @@
   (make-mobile (make-branch 5 10) 
                (make-mobile (make-branch 5 10) (make-branch 5 10))))
 
-;Exercise 2.29.c 
+;Exercise 2.29.c balanced trees
+
+
+
+;Exercise 2.30 map for trees
+;Define square-tree
+
+
+
+(define (square x) (* x x))
+(define test-tree(list (list 1 2) (list 3 4)))
+(define (square-treeV1 tree)
+  (cond ((null? tree) null)
+        ((not (pair? tree)) (square tree))
+        (else (cons (square-treeV1 (car tree))
+                    (square-treeV1 (cdr tree))))))
+
+(define (square-treeV2 tree)
+  (map (lambda (sub-tree)
+         (if (pair? sub-tree)
+           (square-treeV2 sub-tree)
+           (square sub-tree)))
+       tree))
+
+;Exercise 2.31 tree-map
+(define (tree-map proc tree)
+  (map (lambda (sub-tree)
+         (if (pair? sub-tree)
+           (tree-map proc sub-tree)
+           (proc sub-tree)))
+       tree))
+
+(define (square-treeV3 tree) (tree-map (lambda (x) (* x x)) tree))
+
+;Chapter 2.2.3 Interfaces
+(define (filter predicate sequence)
+  (cond ((null? sequence) null)
+        ((predicate (car sequence))
+         (cons (car sequence) (filter predicate (cdr sequence))))
+        (else (filter predicate (cdr sequence)))))
+
+(define (accumelator bin-op base-case sequence)
+  (if (null? sequence)
+    base-case
+    (bin-op (car sequence) (accumelator bin-op base-case (cdr sequence)))))
+
+(define (enumerate-interval low high)
+  (if (> low high)
+    null
+    (cons low (enumerate-interval (+ 1 low) high))))
+
+(define (enumerate-tree tree)
+  (cond ((null?) null)
+        ((not (pair? tree)) (list tree))
+        (else (append (enumerate-tree (car tree))
+                      (enumerate-tree (cdr tree))))))
+
+;Exercise 2.33 basic list-manipulation operations as accumulations
+(define (map-accum p sequence)
+  (accumelator 
+    (lambda (x y) (cons (p x) y))
+    null
+    sequence))
+
+(define (append-accum seq1 seq2)
+  (accumelator cons seq2 seq1))
+
+(define (length-accum sequence)
+  (accumelator (lambda (x y) (+ 1 y)) 0 sequence))
+
+(define (horner-eval x coefficient-sequence)
+  (accumelator (lambda (this-coeff higher-terms)
+                 (+ this-coeff (* x higher-terms)))
+               0
+               coefficient-sequence))
