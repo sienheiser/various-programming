@@ -197,11 +197,6 @@
 ;        (else (+ (count-leaves (car xs)) 
 ;                 (count-leaves (cdr xs))))))
 
+
 (define (count-leaves-accum t)
-(accumelator (lambda (x y) (+ 1 y)) 
-            0 
-            (map (lambda (x)
-                  (if (not (pair? x))
-                       x
-                      (cons (lambda (car x)) (lambda (cdr x))))) 
-            t)))
+  (accumelator + 0 (map (lambda (x) 1) (enumerate-tree t))))
