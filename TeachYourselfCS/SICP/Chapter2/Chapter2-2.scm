@@ -163,7 +163,7 @@
     (cons low (enumerate-interval (+ 1 low) high))))
 
 (define (enumerate-tree tree)
-  (cond ((null?) null)
+  (cond ((null? tree) null)
         ((not (pair? tree)) (list tree))
         (else (append (enumerate-tree (car tree))
                       (enumerate-tree (cdr tree))))))
@@ -181,8 +181,27 @@
 (define (length-accum sequence)
   (accumelator (lambda (x y) (+ 1 y)) 0 sequence))
 
+;Exercise 2.34 Horner evalution of polynomials
 (define (horner-eval x coefficient-sequence)
   (accumelator (lambda (this-coeff higher-terms)
                  (+ this-coeff (* x higher-terms)))
                0
                coefficient-sequence))
+;Exercise 2.35 Count Leaves in terms of accumelator
+;(define (count-leaves t)
+;(accumulate ⟨??⟩ ⟨??⟩ (map ⟨??⟩ ⟨??⟩)))
+
+;(define (count-leaves xs)
+;  (cond ((null? xs) 0)
+;        ((not (pair? xs) 1))
+;        (else (+ (count-leaves (car xs)) 
+;                 (count-leaves (cdr xs))))))
+
+(define (count-leaves-accum t)
+(accumelator (lambda (x y) (+ 1 y)) 
+            0 
+            (map (lambda (x)
+                  (if (not (pair? x))
+                       x
+                      (cons (lambda (car x)) (lambda (cdr x))))) 
+            t)))
