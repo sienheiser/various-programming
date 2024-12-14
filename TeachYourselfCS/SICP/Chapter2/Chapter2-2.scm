@@ -152,10 +152,10 @@
          (cons (car sequence) (filter predicate (cdr sequence))))
         (else (filter predicate (cdr sequence)))))
 
-(define (accumelator bin-op base-case sequence)
+(define (accumulate bin-op base-case sequence)
   (if (null? sequence)
     base-case
-    (bin-op (car sequence) (accumelator bin-op base-case (cdr sequence)))))
+    (bin-op (car sequence) (accumulate bin-op base-case (cdr sequence)))))
 
 (define (enumerate-interval low high)
   (if (> low high)
@@ -170,24 +170,24 @@
 
 ;Exercise 2.33 basic list-manipulation operations as accumulations
 (define (map-accum p sequence)
-  (accumelator 
+  (accumulate 
     (lambda (x y) (cons (p x) y))
     null
     sequence))
 
 (define (append-accum seq1 seq2)
-  (accumelator cons seq2 seq1))
+  (accumulate cons seq2 seq1))
 
 (define (length-accum sequence)
-  (accumelator (lambda (x y) (+ 1 y)) 0 sequence))
+  (accumulate (lambda (x y) (+ 1 y)) 0 sequence))
 
 ;Exercise 2.34 Horner evalution of polynomials
 (define (horner-eval x coefficient-sequence)
-  (accumelator (lambda (this-coeff higher-terms)
+  (accumulate (lambda (this-coeff higher-terms)
                  (+ this-coeff (* x higher-terms)))
                0
                coefficient-sequence))
-;Exercise 2.35 Count Leaves in terms of accumelator
+;Exercise 2.35 Count Leaves in terms of accumulate
 ;(define (count-leaves t)
 ;(accumulate ⟨??⟩ ⟨??⟩ (map ⟨??⟩ ⟨??⟩)))
 
@@ -199,4 +199,84 @@
 
 
 (define (count-leaves-accum t)
-  (accumelator + 0 (map (lambda (x) 1) (enumerate-tree t))))
+  (accumulate + 0 (map (lambda (x) 1) (enumerate-tree t))))
+
+
+
+;Exercise 2.36
+(define (accumulate-n op base seqs)
+  (if (null? (car seqs))
+    null
+    (cons (accumulate op base (map car seqs))
+          (accumulate-n op base (map cdr seqs)))))
+
+(define test-accumulate-n (list (list 1 2 3) (list 4 5 6) (list 7 8 9) (list 10 11 12)))
+
+;Exercise 2.37 Matrix and vector multiplications
+(define (dot-product u v)
+  (accumulate + 0 (map * u v)))
+
+(define (matrix-*-vector m v)
+  (map (lambda (x) (dot-product x v))
+       m))
+
+(define (transpose m)
+  (if (null? m)
+    null
+    (accumulate-n cons null m)))
+
+(define (matrix-*-matrix n m)
+  (let ((cols (transpose n)))
+    (map (lambda (x) (matrix-*-vector cols x)) m)))
+
+
+;Exercise 2.38 foldr and foldl
+
+(define (foldr op base sequence)
+  (if (null? sequence)
+    base
+    (op (car sequence) (foldr op base (cdr sequence)))))
+
+(define (foldl op initial sequence)
+  (define (iter result rest)
+    (if (null? rest)
+    result
+    (iter (op result (car rest))
+    (cdr rest))))
+  (iter initial sequence))
+
+;Exercise 2.39 reverse in terms of foldr and foldl
+(define (reverse-r sequence)
+  (foldr (lambda (x y) (append y (list x)))  
+         null
+         sequence))
+
+(define (reverse-l sequence)
+  (foldl (lambda (x y) (cons y x))
+         null
+         sequence))
+
+;-------------------------------------------------
+
+(define (flatmap proc sequence)
+  (accumulate append null (map proc sequence)))
+
+(define (pairs n)
+  (flatmap (lambda (i) (map (lambda (j) (list i j))
+                            (enumerate-interval 1 (- i 1))))
+           (enumerate-interval 1 n)))
+
+(define (prime-sum pair)
+  (prime? (+ (car pair) (cadr pair))))
+
+(define (make-pair-sum pair)
+  (list (car pair) (cadr pair) (+ (car pair) (cadr pair))))
+
+(define (prime-sum-pairs n)
+  (map make-pair-sum
+       (filter prime-sum 
+               (pairs n))))
+
+
+
+
