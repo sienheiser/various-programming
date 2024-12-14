@@ -279,4 +279,34 @@
 
 
 
+(define (permutations s)
+  (if (null? s)
+    (list null)
+    (flatmap (lambda (x)
+             (map (lambda (p) (cons x p)) 
+                  (permutations (remove x s))))
+         s)))
+
+
+;Exercise 2.41 triple loop
+(define (duplet n)
+  (flatmap (lambda (i) (map (lambda (j) (list i j))
+                            (enumerate-interval 1 (- i 1))))
+       (enumerate-interval 1 n)))
+
+(define (triple n)
+  (flatmap (lambda (i) (flatmap (lambda (j) (map (lambda (k) (list i j k))
+                                             (enumerate-interval 1 j)))
+                            (enumerate-interval 1 i)))
+           (enumerate-interval 1 n)))
+
+(define (triple-equal-to? s triple)
+  (= s (foldl + 0 triple)))
+
+(define (s-triples s n)
+    (filter (lambda (x) (triple-equal-to? s x))
+            (triple n)))
+  
+
+
 
