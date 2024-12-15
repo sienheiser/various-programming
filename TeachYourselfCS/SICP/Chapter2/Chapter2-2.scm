@@ -307,6 +307,59 @@
     (filter (lambda (x) (triple-equal-to? s x))
             (triple n)))
   
+;Exercise 2.42 eight-queens puzzle
+(define make-position list)
+(define get-row car)
+(define get-col cadr)
 
+(define empty-board (list ))
+(define (adjoin-position row col board)
+  (cons (make-position row col) board))
 
+(define (safe-row pk positions)
+  (let ((pos (remove pk positions)))
+    (foldr (lambda (x y) (and x y)) #t (map (lambda (pair) (not (= (car pk) (car pair))))
+                                            positions))))
+(define (safe-col pk positions)
+  (let ((pos (remove pk positions)))
+    (foldr (lambda (x y) (and x y)) #t (map (lambda (pair) (not (= (cadr pk) (cadr pair))))
+                                            positions))))
 
+(define (safe-diag pk positions)
+  (define (sub-position pos1 pos2)
+    (list (- (car pos1) (car pos2))
+          (- (cadr pos1) (cadr pos2))))
+
+  (define (equal-pair pair)
+    (not (= (abs (car pair)) 
+            (abs (cadr pair)))))
+
+  (foldr (lambda (x y) (and x y))
+         #t
+         (map equal-pair
+              (map (lambda (pair) (sub-position pk pair))
+                   positions))))
+
+(define (safe? positions)
+  (let ((pk (car positions))
+        (rest-of-queens (cdr positions)))
+    (and (safe-row pk rest-of-queens)
+         (safe-col pk rest-of-queens)
+         (safe-diag pk rest-of-queens))))
+
+(define (queens board-size)
+  (define (queen-cols k)
+    (if (= k 0)
+      (list empty-board)
+      (filter
+        (lambda (positions) (safe? positions))
+        (flatmap
+          (lambda (rest-of-queens)
+            (map (lambda (new-row)
+                   (adjoin-position
+                    new-row k rest-of-queens))
+                 (enumerate-interval 1 board-size)))
+          (queen-cols (- k 1))))))
+  (queen-cols board-size))
+
+;-------------------------------------------------------------------------------------
