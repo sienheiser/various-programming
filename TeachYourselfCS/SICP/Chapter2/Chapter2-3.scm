@@ -1,114 +1,80 @@
-(define (split op1 op2)
-  (define (foo painter n)
-    (if (= n 0)
-      painter
-      (let ((smaller (foo painter (- n 1))))
-        (op1 painter (op2 smaller smaller)))))
-  foo)
+(define (memq item x)
+  (cond ((null? x) false)
+        ((eq? item (car x)) x)
+        (else (memq item (cdr x)))))
+;Exercise 2.53
+;(list 'a 'b 'c) -> (a b c)
+;(list (list 'george)) -> ((george))
+;(cdr '((x1 x2) (y1 y2))) -> ((y1 y2))
+;(cadr '((x1 x2) (y1 y2))) -> y1
+;(pair? (car '(a short list))) -> #f
+;(memq 'red '((red shoes) (blue socks))) -> #f
+;(memq 'red '(red shoes blue socks)) -> (red shoes blue socks)
+
+;Exercise 2.54 define equal?
+(define (atom? sym)
+  (if (and (not (pair? sym))
+           (not (null? sym)))
+    #t
+    #f))
 
 
-;Exercise 2.46 Procedures for vectors
-(define make-vector cons)
-(define x-vect car)
-(define y-vect cdr)
+(define (equal? sym1 sym2)
+  (cond ((atom? sym1)
+         (cond ((not (atom? sym2)) #f)
+               (else (eq? sym1 sym2))))
+        ((null? sym1)
+         (if (null? sym2) #t #f))
+        ((null? sym2)
+         (if (null? sym1) #t #f))
+        ((not (eq? (car sym1) (car sym2))) #f)
+        (else (equal? (cdr sym1) (cdr sym2)))))
 
 
-(define (vect-arithmetic op)
-  (lambda (u v)
-    (make-vector (op (x-vect u) (x-vect v))
-                 (op (y-vect u) (y-vect v)))))
-(define add-vect (vect-arithmetic +))
-(define sub-vect (vect-arithmetic -))
+;Differentiation program
+(define (=number? m n)
+  (eq? m n))
 
-(define (scale-vect s v)
-  (make-vector (* s (x-vect v))
-               (* s (y-vect v))))
+(define (make-sum a1 a2)
+  (cond ((=number? a1 0) a2)
+        ((=number? a2 0) a1)
+        ((and (number? a1) (number? a2))
+         (+ a1 a2))
+        (else (list '+ a1 a2))))
 
+(define a1 cadr)
+(define a2 caddr)
 
-;Exercise 2.47 define make-frame
-(define (make-frame origin edge1 edge2)
-  (list origin edge1 edge2))
+(define (make-product m1 m2)
+  (cond ((=number? m1 1) m2)
+        ((=number? m2 1) m1)
+        ((=number? m1 0) 0)
+        ((=number? m2 0) 0)
+        ((and (number? m1) (number? m2))
+         (* m1 m2))
+        (else (list '* m1 m2))))
 
-(define (make-frameV2 origin edge1 edge2)
-  (cons origin (cons edge1 edge2)))
+(define m1 cadr)
+(define m2 caddr)
 
-(define frame-origin car)
-(define frame-edge1 cadr)
-(define frame-edge2 caddr)
+(define variable? atom?)
 
-(define frame-edge2V2 cddr)
+(define (same-variable var1 var2)
+  (if (and (variable? var1) (variable? var2))
+    (eq? var1 var2)
+    #f))
 
-;------------------------------------------
-(define (frame-coord-map frame)
-  (lambda (v)
-    (add-vect
-      (origin-frame frame)
-      (add-vect (scale-vect (xcor-vect v) (edge1-frame frame))
-                (scale-vect (ycor-vect v) (edge2-frame frame))))))
+(define (sum? expr)
+  (eq? (car expr) '+))
 
-(define (segments->painter segment-list)
-  (lambda (frame)
-    (for-each
-      (lambda (segment)
-        (drawline
-          ((frame-coord-map frame)
-           (start-segment segment))
-          ((frame-coord-map frame)
-           (end-segment segment))))
-      segment-list)))
+(define (product? expr)
+  (eq? (car expr) '*))
 
-;Exercise 2.48
-(define make-segment cons)
-(define start-segment car)
-(define end-segment cdr)
-
-;Exercise  2.49 Use segments->painter to
-;a) make outline fram painter
-(define outline-segments
-  (list (make-segment (make-vect 0 0) (make-vect 0 1))
-        (make-segment (make-vect 0 1) (make-vect 1 1))
-        (make-segment (make-vect 1 1) (make-vect 0 1))
-        (make-segment (make-vect 0 1) (make-vect 0 0)))
-(define outline (segments->painter outline-segments))
-
-;b) make painter that paints x over a given frame
-(define x-segments
-  (list (make-segment (make-vect 0 1) (make-vect 1 0))
-        (make-segment (make-vect 1 1) (make-vect 0 0))))
-(define x-painter (segments->painter x-segments))
-
-;-------------------------------------------------------
-
-
-(define (transform-painter painter origin corner1 corner2)
-  (lambda (frame)
-    (let ((m (frame-coord-map frame)))
-      (let ((new-origin (m origin)))
-        (painter (make-segment
-                   new-origin
-                   (sub-vect (m corner1) new-origin)
-                   (sub-vect (m corner2) new-origin)))))))
-
-
-(define (flip-vert painter)
-  (transform-painter painter
-                     (make-vect 0.0 1.0)
-                     (make-vect 1.0 1.0)
-                     (make-vect 0.0 0.0)))
-
-
-(define (shrink-to-upper-right painter)
-  (transform-painter painter
-                     (make-vect 0.5 0.5)
-                     (make-vect 1.0 0.5)
-                     (make-vect 0.5 1.0)))
-
-
-
-(define (rotate90 painter)
-  (tranform-painter painter
-                    (make-vect 0.0 1.0)
-                    (make-vect 0.0 0.0)
-                    (make-vect 1.0 1.0)
-
-
+(define (derive expre var)
+  (cond ((variable? expre) 
+         (if (same-variable expre var) 1 0))
+        ((sum? expre) (make-sum (derive (a1 expre) var)
+                                (derive (a2 expre) var)))
+        ((product? expre) (make-sum (make-product (m1 expre) (derive (m2 expre) var))
+                                    (make-product (m2 expre) (derive (m1 expre) var))))
+        (else (error "Unkown expression: DERIVE" expre))))
