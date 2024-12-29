@@ -191,6 +191,17 @@
         ((> x (entry set) (make-tree (car set) (left-branch set) (adjoin-set x (right-branch set)))))
         ((< x (entry set) (make-tree (car set) (adjoin-set x (left-branch set)) (right-branch set))))))
 
+(define (tree->list-2 tree)
+  (define (copy-to-list tree result-list)
+    (if (null? tree)
+      result-list
+      (copy-to-list (left-branch tree)
+                    (cons (entry tree)
+      (copy-to-list
+        (right-branch tree)
+        result-list)))))
+  (copy-to-list tree '()))
+
 ;Exercise 2.64
 (define (list->tree elements)
   (car (partial-tree elements (length elements))))
@@ -216,3 +227,160 @@
                                left-tree
                                right-tree)
                     remaining-elts))))))))
+
+;Exercise 2.65 Use the tree->list-2 and list->tree to
+;define union and intersection between two balanced tree
+(define (intersect-set-b set1 set2)
+  (cond ((or (null? set1) (null? set2)) '())
+        ((= (entry set1) (entry set2)) 
+         (make-tree (entry set1) 
+                    (intersect-set-b (left-branch set1) (left-branch set2))
+                    (intersect-set-b (right-branch set1) (right-branch set2))))
+        ((> (entry set1) (entry set2)) (intersect-set-b set1 (right-branch set2)))
+        ((< (entry set1) (entry set2)) (intersect-set-b set1 (left-branch set2)))))
+
+(define (inter-set-b set1 set2)
+  (list->tree
+    (intersect-set (tree->list-2 set1)
+                   (tree->list-2 set2))))
+
+;Information retrival
+(define (lookup given-key set-of-records)
+  (cond ((null? set-of-records) false)
+        ((equal? given-key (key (car set-of-records)))
+                                (car set-of-records))
+        (else (lookup given-key (cdr set-of-records)))))
+;Exercise 2.66: Implement look-up for ordered and balanced binary trees
+;; Ordered list
+(define (lookup given-key set-of-records)
+  (cond ((null? set-of-records) false)
+        ((eq? given-key (key (car set-of-records))) true)
+        ((< given-key (key (car set-of-records))) false)
+        (else (lookup given-key (cdr set-of-records)))))
+
+;; Balanced binary tree
+(define (lookup given-key set-of-records)
+  (let ((record-key (key (entry (car set-of-records)))))
+    ((cond ((null? set-of-records) false)
+           ((eq? given-key record-key) true)
+           ((> given-key record-key) (lookup given-key (right-branch set-of-records)))
+           ((< given-key record-key) (lookup given-key (left-branch set-of-records)))))))
+
+; Huffmann encoding tree
+(define (make-leaf symbol weight)
+  (list 'leaf symbol weight))
+
+(define (leaf? object) (eq? 'leaf (car object)))
+
+(define (symbol-leaf x) (cadr x))
+
+(define (weight-leaf x) (caddr x))
+
+
+(define (make-code-tree left right)
+  (list left
+        right
+        (append (symbols left) (symbols right))
+        (+ (weight left) (weight right))))
+
+(define (left-branch tree) (car tree))
+(define (right-branch tree) (cadr tree))
+
+(define (symbols tree)
+  (if (leaf? tree)
+    (list (symbol-leaf tree))
+    (caddr tree)))
+
+(define (weight tree)
+    (if (leaf? tree)
+      (weight-leaf tree)
+      (cadddr tree)))
+
+;; Decoding the tree
+(define (choose-branch bit branch)
+  (cond ((= 0 bit) (left-branch branch))
+        ((= 1 bit) (right-branch branch))
+        (else (error "invalid bit " bit))))
+
+(define (decode bits tree)
+  (define (decode-1 bits current-branch)
+    (if (null? bits)
+      null
+      (let ((next-branch (choose-branch (car bits) current-branch)))
+        (if (leaf? next-branch)
+          (cons (symbol-leaf next-branch)
+                (decode-1 (cdr bits) tree))
+          (decode-1 (cdr bits) next-branch)))))
+  (decode-1 bits tree))
+
+(define (adjoin-set x set)
+  (cond ((null? set) (list x))
+        ((< (weight x) (weight (car set))) (cons x set))
+        (else (cons (car set)
+                    (adjoin-set x (cdr set))))))
+
+(define (make-leaf-set pairs)
+  (if (null? pairs) 
+      null
+      (let* ((pair (car pairs))
+             (symbol (car pair))
+             (weight (cadr pair)))
+        (adjoin-set (make-leaf symbol weight) (make-leaf-set (cdr pairs))))))
+
+
+;Exercise 2.67 use the defined sample tree to decode the sample message
+(define sample-tree
+  (make-code-tree (make-leaf 'A 4)
+  (make-code-tree
+    (make-leaf 'B 2)
+    (make-code-tree
+      (make-leaf 'D 1)
+      (make-leaf 'C 1)))))
+(define sample-message '(0 1 1 0 0 1 0 1 0 1 1 1 0))
+
+;Exercise 2.68 Define encode-symbol
+(define (encode-symbol symbol tree)
+  (define (encode-symbol-1 bits symbol tree)
+    (cond ((leaf? tree) (cdr bits))
+          ((equal? (car (symbols tree)) symbol)
+           (encode-symbol-1 (append bits (list 0)) symbol (left-branch tree)))
+          (else (encode-symbol-1 (append bits (list 1)) symbol (right-branch tree)))))
+  (encode-symbol-1 (list 'm ) symbol tree))
+
+(define (encode message tree)
+  (if (null? message)
+    '()
+    (append (encode-symbol (car message) tree)
+            (encode (cdr message) tree))))
+
+;Exercise 2.69 Define generate-huffmann-tree
+(define (generate-huffman-tree pairs)
+  (successive-merge (make-leaf-set pairs)))
+
+(define (successive-merge set)
+  (if (null? (cdr set))
+    (car set)
+    (let* ((fst-elem (car set))
+           (snd-elem (cadr set))
+           (rest-of-elem (cddr set))
+           (new-tree (make-code-tree fst-elem snd-elem)))
+      (successive-merge (adjoin-set new-tree rest-of-elem)))))
+
+;Exercise 2.70 Rock song encoding
+(define rock-set
+  (list (list 'A 2)
+        (list 'GET 2)
+        (list 'SHA 3)
+        (list 'WAH 1)
+        (list 'BOOM 1)
+        (list 'JOB 2)
+        (list 'NA 16)
+        (list 'YIP 9)))
+(define rock-huffman-tree (generate-huffman-tree rock-set))
+
+(define rock-msg (list 'GET 'A 'JOB
+                       'SHA 'NA 'NA 'NA 'NA 'NA 'NA 'NA 'NA
+                       'GET 'A 'JOB
+                       'SHA 'NA 'NA 'NA 'NA 'NA 'NA 'NA 'NA
+                       'WAH 'YIP 'YIP 'YIP 'YIP 'YIP 'YIP 'YIP 'YIP 'YIP
+                       'SHA 'BOOM))
