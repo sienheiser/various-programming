@@ -7,7 +7,7 @@
     (set-mcar! q item))
 
 ;; Conctructor
-(define make-queue
+(define (make-queue)
     (mcons null null))
 
 ;; getters
@@ -23,23 +23,34 @@
     (set-cdr! q item))
 
 ;; types of queues
-(define (empty-queue q)
+(define (empty-queue? q)
     (null? (front-ptr q)))
 
 ;; update queue methods
 (define (delete-queue q)
     (cond ((empty-queue? q)
            (error "DELETE! called with an empty queue" q))
-           (else (set-front-ptr! q (cdr (front-ptr q)))
+           (else (set-front-ptr! q (mcdr (front-ptr q)))
                  q)))
 
-;;(define (insert-queue q item)
-;;    (let ((new-pair (cons item null)))
-;;        (cond ((empty-queue? q)
-;;            (set-front-ptr! q new-pair)
-;;            (set-rear-ptr! q new-pair)
-;;            q)
-;;            (else 
-;;                (set-cdr! (rear-ptr q) new-pair)
-;;                (set-rear-ptr! queue new-pair))
-;;                q)))
+
+(define (insert-queue q item)
+    (let ((new-pair (mcons item null)))
+        (cond ((empty-queue? q)
+            (set-front-ptr! q new-pair)
+            (set-rear-ptr! q new-pair)
+            q)
+            (else (set-cdr! (rear-ptr q) new-pair)
+                  (set-rear-ptr! q new-pair)
+                  q))))
+
+;(define (insert-queue q item)
+;    (let ((new-pair (cons item null)))
+;        (cond ((empty-queue? q)
+;            (set-front-ptr! q new-pair)
+;            (set-rear-ptr! q new-pair)
+;            q)
+;            (else 
+;                (set-cdr! (rear-ptr q) new-pair)
+;                (set-rear-ptr! queue new-pair))
+;                q)))
