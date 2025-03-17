@@ -28,6 +28,13 @@
         balance)
       "Insufficient funds cannot withdraw")))
 
+(define (make-withdrawV2 initial-amount)
+  (let ((balance initial-amount))
+    (lambda (amount)
+      (if (>= balance amount)
+        (begin (set! balance (- balance amount))
+               balance)
+        "Insufficient funds"))))
 
 ;;Commented out because same function used in exercies
 ;; 3.3
@@ -60,7 +67,7 @@
 
 
 ;Exercise 3.2
-(define (make-monitored f)
+(define (make-Monitored f)
   (define calls 0)
   (define (dispatch m)
     (cond ((eq? m 'how-many-calls) calls)
