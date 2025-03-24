@@ -54,3 +54,38 @@
     (if (empty-queue? queue)
         (print "(mcons '() '())")
         (print queue)))
+
+
+
+;Exercise 3.23 Make deque
+
+(define (make-deque) (cons null null))
+
+(define (empty-deque? dq) 
+    (eq? (car dq) null))
+
+(define (front-deque dq)
+    (car dq))
+
+(define (rear-deque dq)
+    (cdr dq))
+
+(define (rear-insert-deque! dq item)
+    (let (new-pair (mcons item null))
+        (cond ((empty-deque? dq)
+            (set-front-ptr! dq new-pair)
+            (set-rear-ptr! dq new-pair)
+            dq)
+            (else (set-cdr! (rear-ptr dq) new-pair)
+                  (set-rear-ptr! dq new-pair)
+                  dq))))
+
+(define (front-insert-deque! dq item)
+    (let (new-ls (mcons item (front-ptr dq)))
+        (cond ((empty-deque? dq)
+               (set-front-ptr! dq new-ls)
+               (set-rear-ptr! dq new-ls)
+               dq)
+              ((else 
+                (set-front-ptr! dq new-ls)
+                dq)))))

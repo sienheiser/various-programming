@@ -35,3 +35,32 @@
             (loop temp x))))
         (loop x '()))
 
+(define (eq-pair p1 p2)
+    (let ((p1l (car p1))
+          (p1r (cdr p1))
+          (p2l (car p2))
+          (p2r (cdr p2)))
+      (and (= p1l p2l)
+           (= p1r p2r)))
+)
+
+
+
+;3.18
+(define (count-pairs x)
+    (let ((storage '()))
+      (define (iter x)
+        (if (or (not (pair? x)) (memq x storage))
+          0
+          (begin
+            (set! storage (cons x storage))
+            (+ (iter (car x))
+               (iter (cdr x))
+               1))))
+      (iter x)))        
+
+;3.19 write a procedure that determines if it is a cycle.
+;Use Flyod's algorithm for finding cycles.
+
+
+
