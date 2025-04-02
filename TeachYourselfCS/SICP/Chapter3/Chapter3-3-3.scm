@@ -54,3 +54,55 @@
             'ok
     )
 )
+
+;Creating local table
+(define (make-table)
+    (let ((local-table (mlist '*table*)))
+        (define (insert! key-1 key-2 value)
+            (let ((subtable
+                (assoc key-1 (mcdr local-table))))
+                (if subtable
+                    (let ((record (assoc key-2 (mcdr subtable))))
+                        (if record
+                            (set-mcdr! record value)
+                            (set-mcdr! subtable
+                                      (mcons (mcons key-2 value)
+                                            (mcdr subtable)))))
+                (set-mcdr! local-table
+                          (mcons (mlist key-1 (mcons key-2 value))
+                                (mcdr local-table)))))
+            'ok)
+        (define (lookup key1 key2)
+            (let ((subtable (assoc key1
+                                   (mcdr local-table))))
+                (if subtable
+                    (let ((record (assoc key2
+                                         (mcdr subtable))))
+                        (if record
+                            (mcdr record)
+                            #f))
+                    #f)))
+        (define (dispatch m)
+            (cond ((eq? m 'lookup) lookup)
+                ((eq? m 'insert!) insert!)
+                (else (error "Unkown message for table:" m))))
+        dispatch
+    ))
+
+(define operation-table (make-table))
+(define get (operation-table 'lookup))
+(define put (operation-table 'insert))
+
+
+;Exercise 3.24 approximate match. In the assoc procedure we have use
+;equal? to check for equality. Lets loosen this check for the case 
+;numeric keys. We match when we are in a tolerance of a key
+(define (same-key? key1 key2)
+    (let ((tol 1))
+        (< (abs (- key1 key2))
+                tol)))
+
+(define (assoc2 key records)
+    (cond ((null? records) #f)
+          ((same-key? (mcar (mcar records)) key) (mcar records))
+          (else (assoc key (mcdr records)))))
