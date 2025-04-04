@@ -161,23 +161,36 @@
             ((equal? (mcar (mcar records)) key) (mcar records))
             (else (assoc key (mcdr records)))))
 
-    (cond ((null? mcdr keys)
-            (let ((record (assoc (mcar keys)
-                                 (mcdr table))))
-                record))
+    (cond ((null? (mcdr keys))
+           (assoc (mcar keys) (mcdr table)))
           (else 
             (let ((subtable (assoc (mcar keys)
                                    (mcdr table))))
                 (if subtable
                     (assoc-gen (mcdr keys) subtable)
                     #f)))))
-          
-(define (make-table3)
-    (let ((local-table (mlist '*table*)))
-        (define (lookup keys)
-            (let ((record (assoc-gen keys local-table)))
-                (if record
-                    (mcdr record)
-                    #f)))))
-        (define (insert! keys value))
-    
+
+ 
+
+
+(define test-tbl2 (mlist '*table* 
+                         (mlist 'subtbl1 
+                                (mlist 'ssubtbl1
+                                       (mcons 'ss11 1)
+                                       (mcons 'ss12 2)
+                                       (mcons 'ss13 3)))
+
+                         (mlist 'subtbl2
+                                (mcons 's21 1)
+                                (mcons 's22 2)
+                                (mcons 's23 3))))
+(define test-tbl3 (mlist '*table*))
+
+(define test-keys2 (mlist 'subtbl1 'ssubtbl1 'ss12))
+(define test-keys3 (mlist 'subtbl2))
+
+(define (lookup keys table)
+    (let ((record (assoc-gen keys (mcdr table))))
+        (if record
+            (mcdr record)
+            #f)))
