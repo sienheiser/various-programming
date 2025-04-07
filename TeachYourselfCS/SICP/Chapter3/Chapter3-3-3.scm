@@ -175,17 +175,21 @@
 ) 
 
 
+;(define test-tbl2 (mlist '*table* 
+;                         (mlist 'subtbl1 
+;                                (mlist 'ssubtbl1
+;                                       (mcons 'ss11 1)
+;                                       (mcons 'ss12 2)
+;                                       (mcons 'ss13 3)))
+;
+;                         (mlist 'subtbl2
+;                                (mcons 's21 1)
+;                                (mcons 's22 2)
+;                                (mcons 's23 3))))
 (define test-tbl2 (mlist '*table* 
                          (mlist 'subtbl1 
                                 (mlist 'ssubtbl1
-                                       (mcons 'ss11 1)
-                                       (mcons 'ss12 2)
-                                       (mcons 'ss13 3)))
-
-                         (mlist 'subtbl2
-                                (mcons 's21 1)
-                                (mcons 's22 2)
-                                (mcons 's23 3))))
+                                       (mcons 'ss12 2)))))
 (define test-tbl3 (mlist '*table*))
 
 (define test-keys2 (mlist 'subtbl1 'ssubtbl1 'ss12))
@@ -200,36 +204,24 @@
 
 (define (make-last-elem keys value)
     (cond ((null? (mcdr keys))
-           (mcons (mcons (mcar keys) value)
-                  null))
+           (mcons (mcar keys) value))
                 
-          (else (mcons (mcar keys) 
+          (else (mlist (mcar keys) 
                        (make-last-elem (mcdr keys)
-                                       value)))
-
-    )
-)
+                                             value)))))
 
 (define (insert! keys value table)
-    (cond ((null? (mcdr keys))
-           (let ((record (assoc (mcar keys) 
-                                (mcdr table))))
-                (if record
-                    (set-mcdr! record value)
-                    (set-mcdr! table (mcons (mcons (mcar keys) 
-                                                   value)
-                                            (mcdr table)))
-                )
-           )
-          )
-          (else 
-            (let ((subtable (assoc (mcar keys)
-                                   (mcdr table))))
-                (if subtable
-                    (insert! (mcdr keys) value (mcdr subtable))
-                    (set-mcdr! table 
-                               (mcons (make-last-elem keys value)
-                                      (mcdr table))))
-            ))
-    )
-)
+  (cond ((null? (mcdr keys))
+         (let ((record (assoc keys (mcdr table))))
+           (if record
+             (set-mcdr! record value)
+             (set-mcdr! table
+                        (mcons (mcons (mcar keys) value)
+                               (mcdr table))))))
+        (else
+          (let ((subtable (assoc keys (mcdr table))))
+            (if subtable
+              (insert! (mcdr keys) value table)
+              (set-mcdr! table
+                         (mcons (make-last-elem keys value)
+                                (mcdr table))))))))
