@@ -155,22 +155,24 @@
     ))
 
 ;Exercise 3.25 contruct make-table that can deal with arbitrary amount of keys.
-(define (assoc-gen keys table)
+
+(define (assoc-gen keys subtables)
     (define (assoc key records)
-        (cond ((null? records) #f)
-            ((equal? (mcar (mcar records)) key) (mcar records))
-            (else (assoc key (mcdr records)))))
-
+            (cond ((null? records) #f)
+                ((equal? (mcar (mcar records)) key) (mcar records))
+                (else (assoc key (mcdr records)))))
     (cond ((null? (mcdr keys))
-           (assoc (mcar keys) (mcdr table)))
-          (else 
-            (let ((subtable (assoc (mcar keys)
-                                   (mcdr table))))
+            (assoc (mcar keys) subtables))
+          (else
+            (let ((subtable (assoc (mcar keys) subtables)))
                 (if subtable
-                    (assoc-gen (mcdr keys) subtable)
-                    #f)))))
-
- 
+                    (assoc-gen (mcdr keys) (mcdr subtable))
+                    #f
+                )
+            )
+          )
+    )
+) 
 
 
 (define test-tbl2 (mlist '*table* 
@@ -194,3 +196,40 @@
         (if record
             (mcdr record)
             #f)))
+
+
+(define (make-last-elem keys value)
+    (cond ((null? (mcdr keys))
+           (mcons (mcons (mcar keys) value)
+                  null))
+                
+          (else (mcons (mcar keys) 
+                       (make-last-elem (mcdr keys)
+                                       value)))
+
+    )
+)
+
+(define (insert! keys value table)
+    (cond ((null? (mcdr keys))
+           (let ((record (assoc (mcar keys) 
+                                (mcdr table))))
+                (if record
+                    (set-mcdr! record value)
+                    (set-mcdr! table (mcons (mcons (mcar keys) 
+                                                   value)
+                                            (mcdr table)))
+                )
+           )
+          )
+          (else 
+            (let ((subtable (assoc (mcar keys)
+                                   (mcdr table))))
+                (if subtable
+                    (insert! (mcdr keys) value (mcdr subtable))
+                    (set-mcdr! table 
+                               (mcons (make-last-elem keys value)
+                                      (mcdr table))))
+            ))
+    )
+)
