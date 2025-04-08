@@ -225,3 +225,54 @@
               (set-mcdr! table
                          (mcons (make-last-elem keys value)
                                 (mcdr table))))))))
+                                
+(define (make-table3)
+    (define (assoc key records)
+        (cond ((null? records) #f)
+            ((equal? (mcar (mcar records)) key) (mcar records))
+            (else (assoc key (mcdr records)))))
+    (define (assoc-gen keys subtables)
+        (cond ((null? (mcdr keys))
+                (assoc (mcar keys) subtables))
+            (else
+                (let ((subtable (assoc (mcar keys) subtables)))
+                    (if subtable
+                        (assoc-gen (mcdr keys) (mcdr subtable))
+                        #f))))) 
+    (define (make-last-elem keys value)
+        (cond ((null? (mcdr keys))
+            (mcons (mcar keys) value))
+                    
+            (else (mlist (mcar keys) 
+                        (make-last-elem (mcdr keys)
+                                                value)))))
+    (define (lookup-gen keys table)
+        (let ((record (assoc-gen keys (mcdr table))))
+            (if record
+                (mcdr record)
+                #f)))
+    (define (insert-gen! keys value table)
+    (cond ((null? (mcdr keys))
+            (let ((record (assoc keys (mcdr table))))
+            (if record
+                (set-mcdr! record value)
+                (set-mcdr! table
+                            (mcons (mcons (mcar keys) value)
+                                (mcdr table))))))
+            (else
+            (let ((subtable (assoc keys (mcdr table))))
+                (if subtable
+                (insert! (mcdr keys) value table)
+                (set-mcdr! table
+                            (mcons (make-last-elem keys value)
+                                    (mcdr table))))))))
+
+    (let ((local-tbl (mlist '*table*)))
+        (define (lookup keys) (lookup-gen keys local-tbl))
+        (define (insert! keys value) (insert-gen! keys value local-tbl))
+        (define (dispatch m)
+            (cond ((eq? 'lookup m) lookup)
+                  ((eq? 'insert! m) insert!)
+                  (else (error "make-table3 message not handled" m))))
+        dispatch))
+                                
