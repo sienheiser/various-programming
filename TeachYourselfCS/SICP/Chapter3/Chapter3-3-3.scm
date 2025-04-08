@@ -276,3 +276,12 @@
                   (else (error "make-table3 message not handled" m))))
         dispatch))
                                 
+
+;Exercise 3.26: Try construct a table that uses in a tree structure so that we can search
+;records quickly. Assume the keys are numeric.
+
+
+
+
+
+;Exercise 3.27: Memoization (tabulation)
