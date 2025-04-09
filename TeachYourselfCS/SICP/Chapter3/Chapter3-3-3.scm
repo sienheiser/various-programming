@@ -285,3 +285,24 @@
 
 
 ;Exercise 3.27: Memoization (tabulation)
+
+(define (memoize f)
+    (let ((table (mlist '*table*)))
+        (lambda (x)
+                (let ((prev-comp-result (lookup x table)))
+                    (if prev-comp-result
+                        prev-comp-result
+                        (let ((result (f x)))
+                            (insert! x result table)
+                            result))))))
+
+(define memo-fib
+    (memoize
+        (lambda (n)
+            (cond ((= n 0) 0)
+                  ((= n 1) 1)
+                  (else (+ (fib (- n 1))
+                           (fib (- n 2))))))))
+
+;Still need to draw the environment diagram for evalution.
+
