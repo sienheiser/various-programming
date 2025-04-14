@@ -1,16 +1,26 @@
+#lang racket/base
 (require racket/mpair)
+;(require racket/time)
 ;Primitive function boxes
 
-(define (get-signal wire))
-(define (set-signal! wire new-value))
-(define (add-action! wire f-no-args))
-(define (after-delay time-delay f))
+;(define (get-signal wire))
+;(define (set-signal! wire new-value))
+;(define (add-action! wire f-no-args))
+;(define (after-delay time-delay f))
+
+(define (get-signal wire) (wire 'get-signal))
+(define (set-signal! wire value) ((wire 'set-signal) value))
+(define (add-action! wire action-procedure) ((wire 'add-action!) action-procedure))
+(define (after-delay delay action)
+    (add-to-aggenda! (+ delay (current-time the-agenda))
+                     action
+                     the-agenda))
 
 
 ;logic gates
 (define (inverter input output)
     (define (invert-input)
-        (let ((new-value (logic-not (get-signal input))))
+        (let ((new-value (logical-not (get-signal input))))
             (after-delay inverter-delay
                         (lambda ()(set-signal! output new-value)))))
     (add-action! input invert-input)
@@ -59,31 +69,31 @@
 ;Suppose we have procedure for full add 
 ;   (full-adder a b c-in sum c-out)
 
-(define (ripple-carry-adder as bs ss c-in c-out)
-    (full-adder (mcar as)
-                (mcar bs)
-                c-in
-                (mcar ss)
-                c-out)
-    (define c (make-wire))
-    (define (iterator as bs ss c-in c-out)
-        (cond ((null? as) )
-              (else
-                (let ((a (mcar as))
-                      (b (mcar bs))
-                      (s (mcar ss))
-                      (c (make-wire)))
-                     (full-adder a
-                                 b
-                                 c-in
-                                 s
-                                 c-out)
-                     (iterator (mcdr as) (mcdr bs) (mcdr ss) c-out c)))))
-    (iterator (mcdr as)
-              (mcdr bs)
-              (mcdr ss)
-              c-out
-              c))
+;(define (ripple-carry-adder as bs ss c-in c-out)
+;    (full-adder (mcar as)
+;                (mcar bs)
+;                c-in
+;                (mcar ss)
+;                c-out)
+;    (define c (make-wire))
+;    (define (iterator as bs ss c-in c-out)
+;        (cond ((null? as) )
+;              (else
+;                (let ((a (mcar as))
+;                      (b (mcar bs))
+;                      (s (mcar ss))
+;                      (c (make-wire)))
+;                     (full-adder a
+;                                 b
+;                                 c-in
+;                                 s
+;                                 c-out)
+;                     (iterator (mcdr as) (mcdr bs) (mcdr ss) c-out c)))))
+;    (iterator (mcdr as)
+;              (mcdr bs)
+;              (mcdr ss)
+;              c-out
+;              c))
 
 (define (ripple-carry-adder as bs ss init-c-in)
     (define init-c-out (make-wire))
@@ -153,13 +163,6 @@
         (begin ((mcar procedures))
                (call-each (mcdr procedures)))))
 
-(define (get-signal wire) (wire 'get-signal))
-(define (set-signal! wire value) ((wire 'set-signal) value))
-(define (add-action! wire action-procedure) ((wire 'add-action) action-procedure))
-(define (after-delay delay action)
-    (add-to-aggenda! (+ delay (current-time the-agenda))
-                     action
-                     the-agenda))
 
 (define (propagate)
     (if (empty-agenda? the-agenda)
@@ -177,3 +180,22 @@
                     (display (current-time the-agenda))
                     (display " New-value = ")
                     (display (get-signal wire)))))
+
+;(define the-agenda (make-agenda))
+(define inverter-delay 2)
+(define and-gate-delay 3)
+(define or-gate-delay 5)
+
+(define input-1 (make-wire))
+(define input-2 (make-wire))
+(define sum (make-wire))
+(define carry (make-wire))
+
+;(probe 'sum sum)
+;(probe 'carry carry)
+
+;Implementing the agenda
+(define (make-time-segment time queue)
+    (cons time queue))
+(define (segment-time s) (car s))
+(define (segment-queue s) (cdr s))
