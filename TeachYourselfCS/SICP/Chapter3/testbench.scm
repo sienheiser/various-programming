@@ -1,0 +1,32 @@
+
+(define (adder a1 a2 sum)
+    (define (process-value)
+        (cond ((and (has-value? a1) (has-value? a2))
+               (set-value! sum (+ (get-value a1)
+                                  (get-value a2))))
+              ((and (has-value? sum) (has-value? a1))
+               (set-value! sum (- (get-value sum)
+                                  (get-value a1))))
+              ((and (has-value? sum) (has-value? a2))
+               (set-value! sum (- (get-value sum)
+                                  (get-value a2))))))
+    (define (dispatch m)
+        (cond ((eq? m 'process-value) process-value)
+              (else (error "Unkown case: ADDER" m)))))
+          
+(define (make-connector)
+    (let ((value false))
+         (define (set-value! new-value)
+            (set! value new-value))
+         (define (has-value?)
+            (if value
+                value
+                false))
+         (define (dispatch m)
+            (cond ((eq? m 'has-value?) has-value?)
+                  ((eq? m 'set-value!) set-value!)
+                  (else (error "Unkown request: CONNECTOR" m))))
+         dispatch))
+
+(define (has-value? connector)
+    (connector 'has-value?))
