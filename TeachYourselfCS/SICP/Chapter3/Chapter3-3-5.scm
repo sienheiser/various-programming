@@ -1,163 +1,129 @@
-; Celsius-Farenhite
-
-(define C (make-connector))
-(define F (make-connector))
-
-(define (celsius-fahrenhite-converter c f)
-    (let ((u (make-connector))
-          (v (make-connector))
-          (w (make-connector))
-          (x (make-connector))
-          (y (make-connector)))
-         (multiplier c w u)
-         (multiplier v x u)
-         (adder v y f)
-         (constant 9 w)
-         (constant 5 x)
-         (constant 32 y)
-         'ok))
-
-
-(define (probe m t)
-    (cond ((eq? m "Celsius temp") (get-celsius t))
-          ((eq? m "Fahrenhite temp") (get-fahrenhite t))
-          (else (error "Invalid Temperature Scale: " m))))
+;representing adder
 
 (define (adder a1 a2 sum)
-    (define (process-new-value)
-        (cond ((and (has-value? a1) (has-value? a2))
-               (set-value! sum 
-                           (+ (get-value a1) (get-value a2))
-                           me))
-              ((and (has-value? a1) (has-value? sum))
-               (set-value! a2
-                           (- (get-value sum) (get-value a1))
-                           me))
-              ((and (has-value? a2) (has-value? sum))
-               (set-value! a1
-                           (- (get-value sum) (get-value a2))
-                           me))))
-    (define (process-forget-value)
-        (forget-value! sum me)
-        (forget-value! a1 me)
-        (forget-value! a2 me)
-        (process-new-value))
-    (define (me request)
-        (cond ((eq? request 'I-have-a-value) (process-new-value))
-              ((eq? request 'I-lost-a-value) (process-forget-value))
-              (else (error "Request not defined: ADDER" request))))
-    (connect a1 me)
-    (connect a2 me)
-    (connect sum me)
-    me)
-(define (inform-about-value constraint)
-    (constraint 'I-have-a-value))
-(define (inform-about-no-value constraint)
-    (constraint 'I-lost-my-value))
+  (define (process-value)
+    (cond ((and (has-value? a1) (has-value? a2))
+           (set-value! sum
+                       (+ (get-value a1) (get-value a2))
+                       dispatcher))
+          ((and (has-value? sum) (has-value? a2))
+           (set-value! a1 
+                       (- (get-value sum) (get-value a2))
+                       dispatcher))
+          ((and (has-value? sum) (has-value? a1))
+           (set-value! a2
+                       (- (get-value sum) (get-value a1))
+                       dispatcher))))
 
-(define (multiplier m1 m2 p)
-    (define (process-new-value)
-        (cond ((or (and (has-value? m1) (= (get-value m1) 0))
-                   (and (has-value? m2) (= (get-value m2) 0)))
-               (set-value! p 0 me))
-              ((and (has-value? m1) (has-value? m2))
-               (set-value! p
-                           (* (get-value m1) (get-value m2))
-                           me))
-             ((and (has-value? p) (has-value? m1))
-              (set-value! m2
-                          (/ (get-value p) (get-value m1))
-                          me))
-             ((and (has-value? p) (has-value? m2))
-              (set-value! m1
-                          (/ (get-value p) (get-value m2))
-                          me))))
-    (define (process-forget-value)
-        (forget-value! sum me)
-        (forget-value! m1 me)
-        (forget-value! m2 me)
-        (process-new-value))
-    (define (me request)
-        (cond ((eq? request 'I-have-a-value) (process-new-value))
-              ((eq? request 'I-lost-a-value) (process-forget-value))
-              (else (error "Request not defined: MULPTIPLER" request))))
-    (connect m1 me)
-    (connect m2 me)
-    (connect sum me)
-    me)
 
-    (define (constant value connector)
-        (define (me request)
-            (error "Unknown request: CONSTANT" request))
-        (connect connector me)
-        (set-value! connector value me)
-        me)
+  (define (forget-value)
+    (forget-value! a1 dispatcher)
+    (forget-value! a2 dispatcher)
+    (forget-value! sum dispatcher)
+    (process-value))
 
-(define (probe name connector)
-    (define (print-probe value)
-        (newline) (display "Probe: ") (display name)
-        (display "= ") (display value))
+  (define (dispatcher request)
+    (cond ((eq? request 'process-value) (process-value))
+          ((eq? request 'forget-value) (forget-value))
+          (else (error "Unknown request: ADDER" request))))
+  (connect a1 dispatcher)
+  (connect a2 dispatcher)
+  (connect sum dispatcher)
+  dispatcher)
+            
 
-    (define (process-new-value)
-        (print-probe (get-value connector)))
-    
-    (define (process-forget-value)
-        (print-probe "?"))
-    
-    (define (me request)
-        (cond ((eq? request 'I-have-a-value) (process-new-value))
-              ((eq? request 'I-lost-my-value) (process-forget-value))
-              (else (error "Unkown request: PROBE" request))))
-    (connect connector me)
-    me)
 
-;Representing connectors
 (define (make-connector)
-    (let ((value false)
-          (informant false)
-          (constraints '()))
-         (define (set-my-value newval setter)
-            (cond ((not (has-value? me))
-                   (set! value newval)
-                   (set! informant setter)
-                   (for-each-except setter
-                                    inform-about-value
-                                    contraints))
-                   ((not (= value newval))
-                    (error "Contradiction" (list value newval)))
-                   (else 'ignored)))
+  (let ((value false)
+        (informant false)
+        (constraints '()))
 
-         (define (forget-my-value retractor)
-            (if (eq? retractor informant)
-                (begin (set! informant false)
-                       (for-each-except retractor
-                                        inform-about-no-value
-                                        constraints))
-                'ignored))
+       (define (has-value?)
+         (if informant true false))
 
-         (define (connect new-constraint)
-            (if (not (memq new-constraint constraints))
-                (set! constraints
-                      (cons new-constraint constraints)))
-            (if (has-value? me)
-                (inform-about-value new-constraint))
-            'done)
 
-         (define (me request)
-            (cond ((eq? request 'has-value?)
-                   (if informant true false))
-                  ((eq? request 'value) value)
-                  ((eq? request 'set-value!) set-my-value)
-                  ((eq? request 'forget) forget-my-value)
-                  ((eq? request 'connect) connect)
-                  (else (error "Unknown operation: CONNECTOR"
-                                request))))
-         me))
+       (define (set-value! new-value setter)
+         (cond ((not (has-value?))
+                (set! informant setter)
+                (set! value new-value)
+                (for-each-except setter
+                                 inform-about-value
+                                 constraints))
+               ((not (eq? value new-value))
+                (error "Contradiction: " (list value new-value)))
+               (else 'ignore)))
 
-(define (for-each-except exception procedure list)
-    (define (loop items)
-        (cond ((null? items) 'done)
-              ((eq? (car items) exception) (loop (cdr items)))
-              (else (procedure (car items))
-                    (loop (cdr items)))))
-    (loop list))
+       (define (forget-value! retractor)
+         (if (eq? informant retractor)
+           (being (set! informant false)
+                  (set! value false)
+                  (for-each-except retractor
+                                   inform-about-no-value
+                                   constraints))
+           'ignore))
+      (define (connect new-constraint)
+        (if (not (memq new-constraint constraints))
+          (set! constraints
+          (cons new-constraint constraints))
+          'ignore)
+        (if (has-value?)
+          (inform-about-value new-constraint)
+          'ignore)
+      'done)
+
+       (define (dispatcher request)
+         (cond ((eq? request 'has-value?) has-value?)
+               ((eq? request 'get-value) value)
+               ((eq? request 'set-value!) set-value!)
+               ((eq? request 'forget-value!) forget-value)
+               ((eq? request 'connect) connect)
+               (else (error "Unknown request: CONNECTOR" request))))
+
+       dispatcher))
+
+(define (for-each-except exception proc list)
+  (define (loop items)
+    (cond ((null? items) 'done)
+          ((eq? exception (car items))
+           (loop (cdr items)))
+          (else (proc (car items))
+                (loop (cdr items)))))
+  (loop list))
+
+(define (inform-about-value constraint)
+  (constraint 'process-value))
+(define (inform-about-no-value constraint)
+  (constraint 'forget-value))
+
+(define (has-value? connector) 
+  (connector 'has-value?))
+(define (get-value connector)
+  (connector 'get-value))
+(define (set-value! connector new-val setter)
+  ((connector 'set-value!) new-val setter))
+(define (forget-value! connector retractor)
+  ((connector 'forget-value) retractor))
+(define (connect connector constraint)
+  ((connector 'connect) constraint))
+
+(define (constant value connector)
+  (define (me request)
+    (error "Unknown request: CONSTANT" request))
+  (connect connector me)
+  (set-value! connector value me)
+  me)
+; Test
+
+(define a1 (make-connector))
+(define a2 (make-connector))
+(define sum (make-connector))
+
+(define c1 (constant 1 a1))
+(define c2 (constant 2 a2))
+
+(define test (adder a1 a2 sum))
+
+
+
+
+
