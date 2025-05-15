@@ -45,6 +45,21 @@ def for_each_except(exception,proc,items):
         if item != exception:
             proc(item)
 
+class Constant:
+    def __init__(self,value,connector:Connector):
+        self.connector = connector.set_value(value, self)
+
+    def process_value(self):
+        ValueError("Error Constant cannot take any requests")
+        
+
+
+def constant(value,connector:Connector):
+    def me(request):
+        ValueError("Unknown request: CONSTANT " + request)
+    connector.set_value(value, me)
+
+
 class Constraint:
     def process_value(self):...
     def forget_value(self):...
@@ -92,8 +107,9 @@ if __name__ == "__main__":
 
     adder = Adder(a1,a2,sum)
 
-    a1.set_value(1,adder)
-    a2.set_value(2,adder)
-    adder.process_value()
-    print(sum.value)
+    constant1 = Constant(1,a1)
+    constant2 = Constant(2,a2)
+
+
+    
 
