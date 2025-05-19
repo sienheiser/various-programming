@@ -30,6 +30,44 @@
   (connect a2 dispatcher)
   (connect sum dispatcher)
   dispatcher)
+
+;representing multipler
+(define (multipler m1 m2 p)
+    (define (process-value)
+        (cond ((or (and (has-value? m1) (= (get-value m1) 0))
+                   (and (has-value? m2) (= (get-value m2) 0)))
+               (set-value! p 0 dispatcher))
+              ((and (has-value? m1) (has-value? m2))
+               (set-value! p
+                           (* (get-value m1) (get-value m2))
+                           dispatcher))
+              ((and (has-value? p) (has-value? m1))
+               (set-value! m2
+                           (/ (get-value p) (get-value m1))
+                           dispatcher))
+              ((and (has-value? p) (has-value? m2))
+               (set-value! m1
+                           (/ (get-value p) (get-value m2))
+                           dispatcher))))
+    
+    (define (forget-value)
+        (forget-value! m1 dispatcher)
+        (forget-value! m2 dispatcher)
+        (forget-value! p dispatcher)
+        (process-value))
+    
+    (define (dispatcher request)
+        (cond ((eq? request 'process-value) (process-value))
+              ((eq? request 'forget-value) (forget-value))
+              (else (error "Unknown request: Multiplier" request))))
+    
+    (connect m1 dispatcher)
+    (connect m2 dispatcher)
+    (connect p dispatcher)
+
+    dispatcher)
+
+
             
 
 
@@ -125,5 +163,39 @@
 
 
 
+;exercise 3.33
+(define (average a b c)
+    (let ((e (make-connector))
+          (f (make-connector)))
+        (adder a b e)
+        (multipler c f e)
+        (constant 2 f)
+        'ok))
+    
+;exercise 3.35 squarer
+(define (squarer a b)
+    (define (process-new-value)
+        (if (has-value? b)
+            (if (< (get-value b) 0)
+                (error "square less than 0: SQUARER"
+                       (get-value b))
+                (set-value! a
+                            (sqrt (get-value b)
+                            dispatcher)))
+            (if (has-value? a)
+                (set-value! b
+                            (* (get-value a)
+                               (get-value a))
+                            dispatcher)
+                'squerer-does-nothing)))
+    (define (process-forget-value)
+        (forget-value! a dispatcher)
+        (forget-value! b dispatcher)
+        (process-new-value))
+    (define (dispatcher request)
+        (cond ((eq? request 'process-value) (process-new-value))
+              ((eq? request 'forget-value) (process-forget-value))
+              (else (error "Unkown request: SQUARER" request))))
+    dispatcher)
 
 
