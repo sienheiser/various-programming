@@ -172,6 +172,8 @@
         (constant 2 f)
         'ok))
     
+
+
 ;exercise 3.35 squarer
 (define (squarer a b)
     (define (process-new-value)
@@ -199,3 +201,9 @@
     dispatcher)
 
 
+;exercise 3.36 
+;(define a (make-connector))
+;(define b (make-connector))
+;(set-value! a 10 'user)
+;using the environment model evaluate 
+;(for-each-except setter inform-about-value constraints)
