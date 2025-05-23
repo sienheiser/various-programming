@@ -4,12 +4,12 @@
         (stream-ref (cdr s) (-n 1))))
 
 (define (stream-map proc s)
-    (if (stream-null? s)
-        the-empty-stream
+    (if (stream-empty? s)
+        empty-stream
         (stream-map proc (stream-cdr s))))
 
 (define (stream-for-each proc s)
-    (if (stream-null? s)
+    (if (stream-empty? s)
         'done
         (begin (proc (stream-car s))
                (stream-for-each proc (stream-cdr s)))))
@@ -37,8 +37,9 @@
     (delayed-object))
 
 
+
 ;Prime numbers
-;; Finding the second prime number
+; Finding the second prime number
 (stream-car
     (stream-cdr 
         (stream-filter prime?
@@ -54,6 +55,21 @@
 
 (define (stream-enumerate-interval low high)
     (if (> low high)
-        the-empty-stream
+        empty-stream
         (cons-stream low
                      (stream-enumerate-interval (+ 1 low) high))))
+
+
+(define (prime? p)
+    (define (is_divisible? i)
+        (= (modulo p i)))
+    
+    (define s (stream-enumerate-interval 2 p))
+
+    (stream-empty (stream-filter is_divisible? s)))
+
+
+    
+    
+    
+
