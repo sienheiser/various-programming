@@ -14,6 +14,19 @@
         (begin (proc (stream-car s))
                (stream-for-each proc (stream-cdr s)))))
 
+(define (stream-filter pred s)
+    (cond ((stream-empty? s) empty-stream)
+          ((pred (stream-car s))
+           (cons-stream (stream-car s)
+                        (stream-filter pred (stream-cdr s))))
+          (else (stream-filter pred (stream-cdr s)))))
+
+(define (stream-enumerate-interval low high)
+    (if (> low high)
+        empty-stream
+        (cons-stream low
+                     (stream-enumerate-interval (+ 1 low) high))))
+
 (define (display-stream s)
     (stream-for-each display-line s))
 
@@ -24,49 +37,40 @@
 (define (cons-stream a b)
     (cons a (delay b)))
 
+(define (delay exp)
+    (lambda () (exp)))
+
 (define (stream-car s)
     (car s))
 
 (define (stream-cdr s)
     (force (cdr s)))
 
-(define (delay exp)
-    (lambda () (exp)))
+(define (force exp)
+    (exp))
 
-(define (force delayed-object)
-    (delayed-object))
-
-
+(define (stream-empty? s)
+    (eq? empty-stream s))
 
 ;Prime numbers
 ; Finding the second prime number
-(stream-car
-    (stream-cdr 
-        (stream-filter prime?
-                       (stream-enumerate-interval 
-                       10000 1000000))))
-
-(define (stream-filter pred s)
-    (cond ((stream-null? s) the-empty-stream)
-          ((pred (car-stream s))
-           (cons-stream (car-stream s)
-                        (stream-filter pred (cdr-stream s))))
-          (else (stream-filter pred (cdr-stream s)))))
-
-(define (stream-enumerate-interval low high)
-    (if (> low high)
-        empty-stream
-        (cons-stream low
-                     (stream-enumerate-interval (+ 1 low) high))))
-
-
 (define (prime? p)
     (define (is_divisible? i)
-        (= (modulo p i)))
+        (= (modulo p i) 0))
     
     (define s (stream-enumerate-interval 2 p))
 
-    (stream-empty (stream-filter is_divisible? s)))
+    (stream-empty? (stream-filter is_divisible? s)))
+
+(define (even? n)
+    (= (modulo n 2) 0))
+;(stream-car
+;    (stream-cdr 
+;        (stream-filter prime?
+;                       (stream-enumerate-interval 
+;                       10000 1000000))))
+
+
 
 
     
