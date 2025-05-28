@@ -64,16 +64,5 @@
 
 (define (even? n)
     (= (modulo n 2) 0))
-;(stream-car
-;    (stream-cdr 
-;        (stream-filter prime?
-;                       (stream-enumerate-interval 
-;                       10000 1000000))))
 
-
-
-
-    
-    
-    
-
+(define s (stream-enumerate-interval 2 5))

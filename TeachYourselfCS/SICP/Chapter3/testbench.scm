@@ -1,23 +1,21 @@
 (define (stream-enumerate-interval low high)
     (if (> low high)
         empty-stream
-        (cons-stream low
-                     (stream-enumerate-interval (+ 1 low) high))))
+        (construct-stream low
+                          (stream-enumerate-interval (+ 1 low) high))))
+(define (construct-stream a b)
+    (cons a (hamper b)))
 
-(define (cons-stream a b)
-    (cons a (delay b)))
+(define (hamper exp)
+    (lambda () exp))
 
-(define (delay exp)
-    (lambda () (exp)))
-
-(define (stream-car s)
+(define (stream-head s)
     (car s))
 
-(define (stream-cdr s)
-    (force (cdr s)))
+(define (stream-tail s)
+    (pressure (cdr s)))
 
-(define (force exp)
-    (exp))
+(define (pressure delayed-obj)
+    (delayed-obj))
 
-(define (stream-empty? s)
-    (eq? empty-stream s))
+(define s (stream-enumerate-interval 1 10))
