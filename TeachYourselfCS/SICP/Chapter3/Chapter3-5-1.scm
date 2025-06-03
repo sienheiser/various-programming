@@ -38,7 +38,7 @@
     (cons a (delay b)))
 
 (define (delay exp)
-    (lambda () (exp)))
+    (lambda () exp))
 
 (define (stream-car s)
     (car s))
@@ -49,8 +49,6 @@
 (define (force exp)
     (exp))
 
-(define (stream-empty? s)
-    (eq? empty-stream s))
 
 ;Prime numbers
 ; Finding the second prime number
@@ -58,11 +56,28 @@
     (define (is_divisible? i)
         (= (modulo p i) 0))
     
-    (define s (stream-enumerate-interval 2 p))
+    (define s (stream-enumerate-interval 2 (- p 1)))
 
-    (stream-empty? (stream-filter is_divisible? s)))
+    (cond ((= p 1) #t)
+          ((= p 2) #t)
+          (else (stream-empty? (stream-filter is_divisible? s)))))
 
-(define (even? n)
-    (= (modulo n 2) 0))
+(define (even? n) (= (modulo n 2) 0))
 
 (define s (stream-enumerate-interval 2 5))
+
+(define primes (stream-filter prime?
+                              (stream-enumerate-interval 1 10)))
+
+
+;Infinite streams
+(define (integers-starting-from n)
+    (cons-stream n (integers-starting-from (+ n 1))))
+
+;(define integers (integers-starting-from 1))
+
+;(define (divisible? x y) (= (remainder x y) 0))
+;
+;(define (no-seven s)
+;    (stream-filter (lambda (x) (not (divisible? x 7)))
+;                   integers))
