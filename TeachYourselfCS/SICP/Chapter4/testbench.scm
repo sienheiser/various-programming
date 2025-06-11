@@ -45,6 +45,49 @@
 (define (eval-quote exp)
     (get-text-from exp))
 
-(define
+(define (eval-application exp env)
+    (apply (eval (operator exp) env)
+           (list-of-values (operands exp) env)))
 
+(define (apply procedure arguments)
+    (cond ((primitive-procedure? procedure)
+           (apply-primitive-procedure procdure arguments)))
+          ((compound-procedure? procdure)
+           (eval-sequence 
+                (procdure-body procedure)
+                (extend-environment
+                    (procedure-parameters procedure)
+                    arguments
+                    (procedure-environment procedure))))
+          (else (error "Unkown procedure type: APPLY" procedure)))
+
+(define (list-of-values exp env)
+    (if (no-operands? exp) 
+        '()
+        (cons (eval (first-operand exp) env)
+              (list-of-values (rest-operands exp) env))))
+
+(define (eval-if exp env)
+    (if (true? (eval (if-predicate exp) env))
+        (eval (if-consequent exp) env)
+        (eval (if-alternative exp) env)))
+
+(define (eval-sequence exp env)
+    (cond ((last-exp? exp)
+           (eval (first-exp exp) env))
+          (else
+           (eval (first-exp exp) env)
+           (eval-sequence (rest-exps exp) env))))
+
+(define (eval-assignment exp env)
+    (set-variable-value! (assignment-variable exp)
+                         (eval (assignment-value exp) env)
+                         env)
+    'ok)
+
+(define (eval-definition exp env)
+    (define-variable! (definition-variable exp)
+                      (eval (definition-value exp) env)
+                      env)
+    'ok)
 
