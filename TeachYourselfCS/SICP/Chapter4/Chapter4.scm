@@ -221,25 +221,102 @@
   (scan (frame-variables frame) (frame-values frame))))
 
 
+(define primitive-procedures
+  (list (list 'car car)
+  (list 'cdr cdr)
+  (list 'cons cons)
+  (list 'null? null?)))
+(define (primitive-procedure-names)
+  (map car primitive-procedures))
+(define (primitive-procedure-objects)
+  (map (lambda (proc) (list 'primitive (cadr proc)))
+  primitive-procedures))
+
+(define (setup-environment)
+  (let ((initial-env
+        (extend-environment (primitive-procedure-names)
+        (primitive-procedure-objects)
+        the-empty-environment)))
+    (define-variable! 'true true initial-env)
+    (define-variable! 'false false initial-env)
+    initial-env))
+(define the-global-environment (setup-environment))
+
+(define (primitive-procedure? proc)
+  (tagged-list? proc 'primitive))
+(define (primitive-implementation proc) (cadr proc))
+
+
+(define (apply-primitive-procedure proc args)
+  (apply-in-underlying-scheme
+  (primitive-implementation proc) args))
+
+(define input-prompt ";;; M-Eval input:")
+(define output-prompt ";;; M-Eval value:")
+(define (driver-loop)
+  (prompt-for-input input-prompt)
+  (let ((input (read)))
+    (let ((output (eval input the-global-environment)))
+      (announce-output output-prompt)
+      (user-print output)))
+  (driver-loop))
+
+
+(define (prompt-for-input string)
+  (newline) (newline) (display string) (newline))
+(define (announce-output string)
+  (newline) (display string) (newline))
+
+(define (user-print object)
+  (if (compound-procedure? object)
+    (display (list 'compound-procedure
+                   (procedure-parameters object)
+                   (procedure-body object)
+                   '<procedure-env>))
+    (display object)))
 
 
 
 
+;Exercise 4.3 rewrite eval in data-directed style
+;(define (deriv exp var)
+;(cond ((number? exp) 0)
+;((variable? exp) (if (same-variable? exp var) 1 0))
+;(else ((get 'deriv (operator exp))
+;(operands exp) var))))
+;(define (operator exp) (car exp))
+;(define (operands exp) (cdr exp))
 
+(define (eval exp env)
+  (cond ((self-evaluating? exp) exp)
+        ((variable? exp) (lookup-variable-value exp env))
+        (else (get 'eval exp env))))
 
+(define (install-eval-package)
+  (define (eval exp env)
+    (cond (((get 'quote) exp) ((get 'eval-quote exp env)))
+          (else "Unknown: EXPRESSION" exp)))
+  (put 'eval eval))
 
+(define (install-eval-quote-package)
+  (define (quote? exp) (tagged-list exp 'quote))
+  (define (eval-quote exp env)'a)
 
+  (put 'eval-quote eval-quote)
+  (put 'quote? quote?))
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    ;((quoted? exp) (text-of-quotation exp))
+    ;((assignment? exp) (eval-assignment exp env))
+    ;((definition? exp) (eval-definition exp env))
+    ;((if? exp) (eval-if exp env))
+    ;((lambda? exp) (make-procedure (lambda-parameters exp)
+    ;                               (lambda-body exp)
+    ;                               env))
+    ;((begin? exp)
+    ; (eval-sequence (begin-actions exp) env))
+    ;((cond? exp) (eval (cond->if exp) env))
+    ;((application? exp)
+    ; (apply (eval (operator exp) env)
+    ;        (list-of-values (operands exp) env)))
+    ;(else
+    ; (error "Unknown expression type: EVAL" exp))))
