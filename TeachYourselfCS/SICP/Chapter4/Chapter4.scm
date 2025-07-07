@@ -347,13 +347,19 @@
           (else
            (eval (first-exp exps) env)
            (eval-sequence (rest-exps exps) env))))
-  (put 'eval 'begin eval)))
+  (put 'eval 'begin eval))
 
-    ;((begin? exp)
-    ; (eval-sequence (begin-actions exp) env))
-    ;((cond? exp) (eval (cond->if exp) env))
-    ;((application? exp)
-    ; (apply (eval (operator exp) env)
-    ;        (list-of-values (operands exp) env)))
-    ;(else
-    ; (error "Unknown expression type: EVAL" exp))))
+(define (install-eval-cond-pkg)
+  (define (eval-cond exp env)
+    (eval (cond->if exp) env))
+    
+  (put 'eval 'begin eval-cond))
+
+(define (install-eval-application-pkg)
+  (define (eval-application exp env)
+    (apply (eval (operator exp) env)
+           (list-of-values (operands exp) env)))
+
+  (put 'eval 'application eval-application))
+
+;exercise 4.4
