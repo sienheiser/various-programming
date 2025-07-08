@@ -363,3 +363,13 @@
   (put 'eval 'application eval-application))
 
 ;exercise 4.4
+(define (install-eval-and-pkg)
+  (define (eval-and exp env)
+    (if (null? exp)
+      #t
+      (if (eq? (eval (car exp) env) #f)
+        #f
+        (eval-and (cdr exp) env))))
+  (put 'eval 'and eval-and))
+
+             
