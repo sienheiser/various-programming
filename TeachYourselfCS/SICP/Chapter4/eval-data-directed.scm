@@ -100,6 +100,53 @@
 (install-eval-definition-pkg)
 
 
+(define (install-eval-if-pkg)
+  (define (eval-if exp env)
+    (let ((pred (if-predicate exp))
+          (consequent (if-consequent exp))
+          (alternative (if-alternative exp)))
+      (if (true? (eval pred env))
+        (eval consequent env)
+        (eval alternative env))))
+
+  (define (if-predicate exp) (cadr exp))
+  (define (if-consequent exp) (caddr exp))
+  (define (if-alternative exp) (cadddr exp))
+
+  (put 'eval 'if eval-if)
+  'intstall-eval-if-pkg-ok)
+(install-eval-if-pkg)
+
+(define (install-eval-lambda-pkg)
+  (define (eval-lambda exp env)
+    (make-procedure (procedure-args exp)
+                    (procedure-body exp)
+                    env))
+  (define (make-procedure args body env)
+    '(procedure args body env))
+  (define (procedure-args exp) (cadr exp))
+  (define (procedure-body exp) (caddr exp))
+
+  (put 'eval 'lambda eval-lambda)
+  'install-eval-lambda-pkg-ok)
+(install-eval-lambda-pkg)
+
+(define (install-eval-begin-pkg)
+  (define (eval-begin exp env)
+    (eval-sequence (begin-actions exp) (env)))
+
+  (define (eval-sequence actions env)
+    (if (last-exp? actions)
+      (eval (first-action actions) env)
+      ((eval (first-action actions) env)
+       (eval-sequence (rest-exps actions) env))))
+  
+  (put 'eval 'begin eval-begin)
+  'install-eval-begin-pkg)
+
+(install-eval-begin-pkg)
+
+
 
 (define the-empty-environment '())
 (define (enclosing-environment env) (cdr env))
@@ -112,9 +159,6 @@
   (if (null? frame)
     null
     (cons (cdar frame) (frame-values (cdr frame)))))
-
-
-
 
 
 
@@ -135,58 +179,12 @@
 
 
 (define env (list (make-frame (list 'y) (list 2))))
+(define if-exp '(if 1 1 0))
+(define lambda-exp '(lambda (x y z) (+ x y z)))
+(define begin-exp  '(begin 1 2 x t))
 (define exp '(define x 4))
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+(define (true? x)
+  (not (eq? x #f)))
