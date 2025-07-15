@@ -133,13 +133,19 @@
 
 (define (install-eval-begin-pkg)
   (define (eval-begin exp env)
-    (eval-sequence (begin-actions exp) (env)))
+    (eval-sequence (begin-actions exp) env))
 
-  (define (eval-sequence actions env)
-    (if (last-exp? actions)
-      (eval (first-action actions) env)
-      ((eval (first-action actions) env)
-       (eval-sequence (rest-exps actions) env))))
+(define (eval-sequence exps env)
+  (cond ((last-exp? exps)
+         (eval (first-exp exps) env))
+        (else
+         (eval (first-exp exps) env)
+         (eval-sequence (rest-exps exps) env))))
+  
+  (define (begin-actions exp)
+    (cdr exp))
+  (define (first-action exp)
+    (car exp))
   
   (put 'eval 'begin eval-begin)
   'install-eval-begin-pkg)
@@ -160,7 +166,12 @@
     null
     (cons (cdar frame) (frame-values (cdr frame)))))
 
-
+(define (last-exp? exp)
+  (null? (cdr exp)))
+(define (first-exp exp)
+  (car exp))
+(define (rest-exps exp)
+  (cdr exp))
 
 
 
@@ -181,7 +192,7 @@
 (define env (list (make-frame (list 'y) (list 2))))
 (define if-exp '(if 1 1 0))
 (define lambda-exp '(lambda (x y z) (+ x y z)))
-(define begin-exp  '(begin 1 2 x t))
+(define begin-exp  '(begin 1 2))
 (define exp '(define x 4))
 
 
