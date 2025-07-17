@@ -22,7 +22,7 @@
         ((variable? exp) (lookup-variable-value exp env))
         (else (let* ((type (get-type exp))
                      (proc (get 'eval type)))
-                (if proc
+                (if (not (null? proc))
                   (proc exp env)
                   (error "Unknown expression: EVAL" exp))))))
 
@@ -241,10 +241,9 @@
 (define if-exp '(if 1 1 0))
 (define lambda-exp '(lambda (x y z) (+ x y z)))
 (define begin-exp  '(begin 1 2))
-(define cond-exp '(cond ((eq? 1 1) 1) (else 2)))
+(define bla-exp '(1 2 3))
+(define cond-exp '(cond (1 1) (else 2)))
 (define exp '(define x 4))
-
-
 
 (define (true? x)
   (not (eq? x #f)))
