@@ -146,8 +146,8 @@
           (error "ELSE clause isn't last: COND->IF"
                  clauses))
         (make-if (cond-predicate first)
-        (sequence->exp (cond-actions first))
-        (expand-clauses rest))))))
+                 (sequence->exp (cond-actions first))
+                 (expand-clauses rest))))))
 
 
 (define (true? x)
