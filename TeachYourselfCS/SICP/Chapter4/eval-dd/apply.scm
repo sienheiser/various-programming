@@ -1,0 +1,45 @@
+(load "eval-dd/utilities.scm")
+
+(define (install-eval-apply-pkg)
+  (define (eval-apply exp env)
+    (apply (eval (operator exp) env)
+           (list-of-values (operands exp) env)))
+
+  (define (apply procedure arguments)
+          (cond ((primitive-procedure? procedure)
+                (apply-primitive-procedure procedure arguments))
+                ((compound-procedure? procedure)
+                (eval-sequence
+                    (procedure-body procedure)
+                    (extend-environment
+                      (procedure-parameters procedure)
+                      arguments
+                      (procedure-environment procedure))))
+                (else
+                (error
+                  "Unknown procedure type: APPLY" procedure))))
+
+  (define (apply-primitive-procedure proc args)
+    (apply-in-underlying-scheme
+    (primitive-implementation proc) args))
+
+  (define (primitive-implementation proc) (cadr proc))
+
+  (define (primitive-procedure? proc)
+    (tagged-list? proc 'primitive))
+
+  (define (compound-procedure? p)
+    (tagged-list? p 'procedure))
+
+  (define (operator exp) (cadr exp))
+  (define (operands exp) (cddr exp))
+  (define (no-operands? exps) (null? exps))
+
+  (define (list-of-values exps env)
+    (if (no-operands? exps)
+      '()
+      (cons (eval (first-operand exps) env)
+            (list-of-values (rest-operands exps) env))))
+
+  (put 'eval 'application eval-apply)
+  'install-eval-apply-pkg-ok)
