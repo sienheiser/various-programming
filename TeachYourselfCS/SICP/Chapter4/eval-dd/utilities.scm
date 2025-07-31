@@ -50,6 +50,7 @@
   (not (eq? x #f)))
 
 (define (lookup-variable-value var env)
+
   (define (env-loop env)
     (define (scan vars vals)
       (cond ((null? vars)
@@ -62,3 +63,10 @@
         (scan (frame-variables frame)
               (frame-values frame)))))
   (env-loop env))
+
+
+(define (first-operand ops) (car ops))
+(define (rest-operands ops) (cdr ops))
+(define (operator exp) (cadr exp))
+(define (operands exp) (cddr exp))
+(define (no-operands? exps) (null? exps))

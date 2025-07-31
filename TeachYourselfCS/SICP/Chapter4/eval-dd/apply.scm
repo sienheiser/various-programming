@@ -2,10 +2,14 @@
 
 (define (install-eval-apply-pkg)
   (define (eval-apply exp env)
+    (display (operator exp))
+    (display (operands exp))
     (apply (eval (operator exp) env)
            (list-of-values (operands exp) env)))
 
   (define (apply procedure arguments)
+          (display procedure)
+          (display arguments)
           (cond ((primitive-procedure? procedure)
                 (apply-primitive-procedure procedure arguments))
                 ((compound-procedure? procedure)
@@ -31,15 +35,13 @@
   (define (compound-procedure? p)
     (tagged-list? p 'procedure))
 
-  (define (operator exp) (cadr exp))
-  (define (operands exp) (cddr exp))
-  (define (no-operands? exps) (null? exps))
 
   (define (list-of-values exps env)
     (if (no-operands? exps)
       '()
       (cons (eval (first-operand exps) env)
             (list-of-values (rest-operands exps) env))))
+
 
   (put 'eval 'application eval-apply)
   'install-eval-apply-pkg-ok)
