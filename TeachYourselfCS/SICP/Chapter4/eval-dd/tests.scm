@@ -64,8 +64,9 @@
          'no))
 
 (define (test-apply)
-    (define exp '(application (primitive +) 1 2))
-    (define env '())
+    (define exp '(application + 1 2))
+    (define frame (make-frame '(+) (list (list 'primitive +))))
+    (define env (list frame))
     (eq? (eval exp env)
          3))
 

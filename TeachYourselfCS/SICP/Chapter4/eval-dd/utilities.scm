@@ -70,3 +70,8 @@
 (define (operator exp) (cadr exp))
 (define (operands exp) (cddr exp))
 (define (no-operands? exps) (null? exps))
+
+(define (tagged-list? exp tag)
+  (if (pair? exp)
+    (eq? (car exp) tag)
+    false))
