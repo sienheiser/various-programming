@@ -29,13 +29,26 @@
         'false
         (let ((first (car clauses))
               (rest (cdr clauses)))
-          (if (else-clause? first) 
-              (if (null? rest)
-                (sequence->exp (clause-actions first))
-                (error "ELSE clause isn't last: COND->IF"))
-              (make-if (clause-predicate first)
-                       (sequence->exp (clause-actions first))
-                       (expand-clauses rest))))))
+          (cond ((else-clause? first)
+                 (if (null? rest)
+                  (sequence->exp (clause-actions first))
+                  (error "ELSE clause isn't last: COND->IF")))
+                ((=>-clause? first) 
+                 (eval-=> first rest))
+                (else (make-if (clause-predicate first)
+                               (sequence->exp (clause-actions first))
+                               (expand-clauses rest)))))))
+
+  (define (=>-clause? exp)
+    (eq? (cadr exp) '=>))
+
+  (define (eval-=> first rest)
+    (let ((test (car first))
+          (recepient (caddr first)))
+      (make-if test
+              (test recepient)
+              (expand-clauses rest))))
+
 
   (define (cond-clauses exp)
     (cdr exp))

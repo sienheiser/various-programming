@@ -94,6 +94,14 @@
     (eq? (eval exp env)
          #t))
 
+(define (test-=>)
+    (define exp '(cond ((car (list a)) => (lambda (x) x))
+                       (else #f)))
+    (define frame (make-frame '(car) (list (list 'primitive car))))
+    (define env '(list frame))
+    (eq? (eval exp env)
+         'a))
+
 (define (run-tests)
     (display-test "test-self-evaluating" test-self-evaluating)
     (display-test "test-variable" test-variable)
@@ -110,6 +118,7 @@
     (display-test "test-and-false" test-and-false)
     (display-test "test-or-true" test-or-true)
     (display-test "test-or-false" test-or-false)
+    (display-test "test-=>" test-=>)
     'tests-finished)
 
 (define (display-test test-name test-func)
