@@ -5,6 +5,7 @@
 (load "eval-dd/begin.scm")
 (load "eval-dd/apply.scm")
 (load "eval-dd/utilities.scm")
+(load "eval-dd/and.scm")
 
 (define *op-table* (make-hash-table))
 
@@ -52,13 +53,4 @@
 (install-eval-begin-pkg)
 (install-eval-cond-pkg)
 (install-eval-apply-pkg)
-
-(define env (list (make-frame (list 'y) (list 2))))
-(define if-exp '(if 1 1 0))
-(define lambda-exp '(lambda (x y z) (+ x y z)))
-(define begin-exp  '(begin 1 2))
-(define bla-exp '(1 2 3))
-(define cond-exp '(cond (1 1) (else 2)))
-(define apply-exp '(application primitive + (1 2)))
-(define exp '(define x 4))
-
+(install-eval-and-pkg)

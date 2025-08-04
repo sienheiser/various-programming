@@ -40,11 +40,11 @@
 (define (procedure-environment p) (cadddr p))
 
 (define (eval-sequence exps env)
-(cond ((last-exp? exps)
-        (eval (first-exp exps) env))
-      (else
-        (eval (first-exp exps) env)
-        (eval-sequence (rest-exps exps) env))))
+  (cond ((last-exp? exps)
+          (eval (first-exp exps) env))
+        (else
+          (eval (first-exp exps) env)
+          (eval-sequence (rest-exps exps) env))))
 
 (define (true? x)
   (not (eq? x #f)))
