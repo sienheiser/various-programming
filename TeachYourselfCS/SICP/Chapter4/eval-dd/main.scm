@@ -6,6 +6,8 @@
 (load "eval-dd/apply.scm")
 (load "eval-dd/utilities.scm")
 (load "eval-dd/and.scm")
+(load "eval-dd/or.scm")
+
 
 (define *op-table* (make-hash-table))
 
@@ -54,3 +56,4 @@
 (install-eval-cond-pkg)
 (install-eval-apply-pkg)
 (install-eval-and-pkg)
+(install-eval-or-pkg)

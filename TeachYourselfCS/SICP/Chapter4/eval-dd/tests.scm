@@ -82,6 +82,18 @@
     (eq? (eval exp env)
          #f))
 
+(define (test-or-false)
+    (define exp '(or #f #f #f))
+    (define env '())
+    (eq? (eval exp env)
+         #f))
+
+(define (test-or-true)
+    (define exp '(or #f #t #f))
+    (define env '())
+    (eq? (eval exp env)
+         #t))
+
 (define (run-tests)
     (display-test "test-self-evaluating" test-self-evaluating)
     (display-test "test-variable" test-variable)
@@ -95,7 +107,9 @@
     (display-test "test-cond-else" test-cond-else)
     (display-test "test-apply" test-apply)
     (display-test "test-and-true" test-and-true)
-    (display-test "test-and-true" test-and-true)
+    (display-test "test-and-false" test-and-false)
+    (display-test "test-or-true" test-or-true)
+    (display-test "test-or-false" test-or-false)
     'tests-finished)
 
 (define (display-test test-name test-func)
