@@ -43,10 +43,13 @@
     (eq? (cadr exp) '=>))
 
   (define (eval-=> first rest)
-    (let ((test (car first))
-          (recepient (caddr first)))
-      (make-if test
-              (test recepient)
+    (let* ((test (car first))
+           (operator (car test))
+           (operands (cadr test))
+           (appli    '(application operator operands))
+           (recepient (caddr first)))
+      (make-if appli
+              '(application recepient appli)
               (expand-clauses rest))))
 
 
