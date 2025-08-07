@@ -43,14 +43,11 @@
     (eq? (cadr exp) '=>))
 
   (define (eval-=> first rest)
-    (let* ((test (car first))
-           (operator (car test))
-           (operands (cadr test))
-           (appli    '(application operator operands))
-           (recepient (caddr first)))
-      (make-if appli
-              '(application recepient appli)
-              (expand-clauses rest))))
+    (let ((test (car first))
+          (recepient (caddr first)))
+      (make-if (list 'application true? test)
+               (list 'application recepient test)
+               (expand-clauses rest))))
 
 
   (define (cond-clauses exp)
