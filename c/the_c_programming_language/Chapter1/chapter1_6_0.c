@@ -3,12 +3,15 @@
 
 
 void countDigitAppearance(void);
-void WordLengthHorizontalHistorgram(void);
-char isWhitespace(int c);
+void wordLengthHorizontalHist(void);
+int* record_words(int max_length_word);
+int is_whitespace(int c);
+void print_horizontal_hist(int *word_length_bin);
+
 
 int main()
 {
-    WordLengthHorizontalHistorgram();
+    wordLengthHorizontalHist();
     return 0;
 }
 
@@ -35,74 +38,68 @@ void countDigitAppearance(void){
     printf(", nwhitespace = %d, nothers = %d\n",nwhite,nother);
 }
 
-void WordLengthHorizontalHistorgram(void){
+void wordLengthHorizontalHist(void){
+    int max_length_word;
+    max_length_word = 10;
 
+    int *word_length_bin;
+    word_length_bin = record_words(max_length_word);
 
-    int nc,c,maxCount,maxWordLength;
-    nc = maxCount = 0;
-    maxWordLength = 10;
-    int wordLengthBin[maxWordLength];
+    // print_horizontal_hist(word_length_bin);
 
-    int i;
-    for (i=0;i<maxWordLength;i++){
-        wordLengthBin[i]=0;
-    }
-
-    while ((c = getchar()) != EOF){
-        ++nc;
-        if (isWhitespace(c)){
-            if (nc > 1 && nc < maxWordLength)
-                ++wordLengthBin[nc - 1];
-            nc = 0;
-            if (wordLengthBin[nc - 1]>maxCount)
-                maxCount = wordLengthBin[nc - 1];
-        }     
-    }
-
-    if (nc > 0 && nc < maxWordLength)
-        ++wordLengthBin[nc];
-
-    printf("%d",0);
-    for (i=1;i<(maxCount-1);i++){
-        printf(" %d",i);
-    }
-    printf("\n");
-    int j;
-    for (i=0;i<maxWordLength;i++){
-        nc = wordLengthBin[i];
-        for (j=0;j<nc;j++)
-            printf("--");
-        printf("\n");
-    }
-    printf(" %d\n",maxWordLength-1);
 }
 
-char isWhitespace(int c){
-    if (c == '\n' || c == '\t' || c == ' ')
+int* record_words(int max_length_word){
+    int num_char,c,i;
+
+    int word_length_bin[max_length_word];
+    for (i=0;i<max_length_word;i++){
+        word_length_bin[i] = 0;
+    }
+
+    num_char = c = 0;
+    while ((c = getchar()) != EOF){
+        ++num_char;
+        if (is_whitespace(c)){
+            if (num_char <= max_length_word){
+                ++word_length_bin[num_char];
+            }
+        }
+    }
+    return word_length_bin;
+}
+
+int is_whitespace(int c){
+    if (c == ' ' || c == '\n' || c=='\t')
         return 1;
     else
         return 0;
 }
 
 /*
-int wordLengthBin[100];
-define IN 1
-define OUT 0
-int nchar,c,state
+max_length_word = 10
+word_length_bin = get_word_length_bin(max_length_word)
 
-int i
-for (i=0;i<100;i++){
-    wordLengthBin[i] = 0;
-}
-state = OUT
+print_horizontal_hist(word_length_bin)
 
-while c = getchar() != EOF:
-    ++nchar
-    if c == '\n' || c == '\t' || c == ' ':
-        state = OUT;
-        ++wordLengthBin[nchar]
-        nchar = 0
+def get_word_length_bin(max_length_word:int)->List[int]:
+    num_char = 0
+    c = 0
+    word_length_bin[max_length_word]
+    for i in range(max_length_word):
+        word_length_bin[i] = 0
 
-printHorizontalHistorgram(wordLengthBin);
+    while (c = getchar()) != EOF:
+        ++num_char
+        if is_whitespace(c):
+            if num_char <= max_length_word:
+                word_length_bin[num_char] += 1
+    return word_length_bin
+
+def print_horizontal_hist(word_length_bin:List[int])->None:
+    max_length = get_max_length(word_length_bin)
+    print_numbers(max_length)
+    for i in range(word_length_bin):
+        print_hypen(i,word_length_bin[i])
 
 */
