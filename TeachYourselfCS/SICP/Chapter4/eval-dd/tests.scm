@@ -32,6 +32,14 @@
     (eval exp env)
     (= (eval 'y env)
        7))
+(define (test-lambda)
+    (define exp (list 'application 
+                      (list 'lambda (list 'x) 'x)
+                      'a))
+    (define env (list (cons (list 'a) (list 1))))
+    (eq? (eval exp env)
+         'a))
+
 
 (define (test-if-consequent)
     (define exp '(if '(application true? 'yes) (quote yes) (quote no)))
@@ -127,6 +135,7 @@
     (display-test "test-quote" test-quote)
     (display-test "test-assignment" test-assignment)
     (display-test "test-definition" test-definition)
+    (display-test "test-lambda" test-lambda)
     (display-test "test-if-consequent" test-if-consequent)
     (display-test "test-if-alternative" test-if-alternative)
     (display-test "test-begin" test-begin)

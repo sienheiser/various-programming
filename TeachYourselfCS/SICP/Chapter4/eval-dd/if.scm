@@ -42,12 +42,21 @@
   (define (=>-clause? exp)
     (eq? (cadr exp) '=>))
 
+  ;(define (eval-=> first rest)
+  ;  (let ((test (car first))
+  ;        (recepient (caddr first)))
+  ;    (make-if (list 'application true? test)
+  ;             (list 'application recepient test)
+  ;             (expand-clauses rest))))
+
   (define (eval-=> first rest)
-    (let ((test (car first))
-          (recepient (caddr first)))
-      (make-if (list 'application true? test)
-               (list 'application recepient test)
-               (expand-clauses rest))))
+  (let ((test (car first))
+        (recipient (caddr first)))
+    (list (list 'lambda (list 'value)
+                (make-if 'value
+                         (list recipient 'value)
+                         (expand-clauses rest)))
+          test)))
 
 
   (define (cond-clauses exp)
