@@ -4,10 +4,11 @@
 
 void countDigitAppearance(void);
 void wordLengthHorizontalHist(void);
-int* record_words(int max_length_word);
+void record_words(int *word_length_bin,int max_length_word);
 int is_whitespace(int c);
-void print_horizontal_hist(int *word_length_bin);
-
+void print_horizontal_hist(int max_length_word,int *word_length_bin);
+int get_max_length(int max_length_word, int *word_length_bin);
+void print_numbers(int max_length);
 
 int main()
 {
@@ -42,17 +43,22 @@ void wordLengthHorizontalHist(void){
     int max_length_word;
     max_length_word = 10;
 
-    int *word_length_bin;
-    word_length_bin = record_words(max_length_word);
+    int word_length_bin[max_length_word];
+    int i;
 
-    // print_horizontal_hist(word_length_bin);
+    record_words(word_length_bin,max_length_word);
+
+    for (i=0;i<max_length_word;i++){
+        printf("%d\n",word_length_bin[i]);
+    }
+
+    print_horizontal_hist(max_length_word,word_length_bin);
 
 }
 
-int* record_words(int max_length_word){
+void record_words(int *word_length_bin,int max_length_word){
     int num_char,c,i;
 
-    int word_length_bin[max_length_word];
     for (i=0;i<max_length_word;i++){
         word_length_bin[i] = 0;
     }
@@ -61,12 +67,12 @@ int* record_words(int max_length_word){
     while ((c = getchar()) != EOF){
         ++num_char;
         if (is_whitespace(c)){
-            if (num_char <= max_length_word){
-                ++word_length_bin[num_char];
+            if ((0 <= num_char) && (num_char <= max_length_word)){
+                ++word_length_bin[num_char-2];
+                num_char = 0;
             }
         }
     }
-    return word_length_bin;
 }
 
 int is_whitespace(int c){
@@ -74,6 +80,31 @@ int is_whitespace(int c){
         return 1;
     else
         return 0;
+}
+
+void print_horizontal_hist(int max_length_word, int *word_length_bin){
+    int max_length,i;
+    max_length = get_max_length(max_length_word,word_length_bin);
+    print_numbers(max_length);
+    // for (i=0;i<max_length_word;i++){
+    //     print_hypen(i,word_length_bin[i]);
+    // }
+}
+
+int get_max_length(int max_length_word, int *word_length_bin){
+    int index,i;
+    for (i=0;i<max_length_word;i++)
+        if (word_length_bin[i] != 0)
+            index = i;
+    return index;
+}
+
+void print_numbers(int max_length){
+    int i;
+    for (i=0;i<max_length;i++){
+        printf("%d ",i+1);
+    }
+    printf("%d\n", max_length+1);
 }
 
 /*
