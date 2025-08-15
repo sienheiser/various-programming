@@ -77,6 +77,10 @@ void record_words(int *word_length_bin,int max_length_word){
     }
 }
 
+void record_chars(int *char_freq_bin, int max_num_chars){
+
+}
+
 int is_whitespace(int c){
     if (c == ' ' || c == '\n' || c=='\t')
         return 1;
