@@ -8,7 +8,9 @@ void record_words(int *word_length_bin,int max_length_word);
 int is_whitespace(int c);
 void print_horizontal_hist(int max_length_word,int *word_length_bin);
 int get_max_length(int max_length_word, int *word_length_bin);
+int get_max_count(int max_length_word, int *word_length_bin);
 void print_numbers(int max_length);
+void print_hypen(int num_letters, int count);
 
 int main()
 {
@@ -48,9 +50,9 @@ void wordLengthHorizontalHist(void){
 
     record_words(word_length_bin,max_length_word);
 
-    for (i=0;i<max_length_word;i++){
-        printf("%d\n",word_length_bin[i]);
-    }
+    // for (i=0;i<max_length_word;i++){
+    //     printf("%d\n",word_length_bin[i]);
+    // }
 
     print_horizontal_hist(max_length_word,word_length_bin);
 
@@ -84,11 +86,11 @@ int is_whitespace(int c){
 
 void print_horizontal_hist(int max_length_word, int *word_length_bin){
     int max_length,i;
-    max_length = get_max_length(max_length_word,word_length_bin);
-    print_numbers(max_length);
-    // for (i=0;i<max_length_word;i++){
-    //     print_hypen(i,word_length_bin[i]);
-    // }
+    int max_count = get_max_count(max_length_word,word_length_bin);
+    print_numbers(max_count);
+    for (i=0;i<max_length_word;i++){
+        print_hypen(i,word_length_bin[i]);
+    }
 }
 
 int get_max_length(int max_length_word, int *word_length_bin){
@@ -99,12 +101,33 @@ int get_max_length(int max_length_word, int *word_length_bin){
     return index;
 }
 
+int get_max_count(int max_length_word, int *word_length_bin){
+    int count,i;
+    count = 0;
+    for (i=0;i<max_length_word;i++){
+        if (word_length_bin[i] > count)
+            count = word_length_bin[i];
+    }
+    return count;
+}
+
 void print_numbers(int max_length){
     int i;
+    printf("  ");
     for (i=0;i<max_length;i++){
         printf("%d ",i+1);
     }
     printf("%d\n", max_length+1);
+}
+
+void print_hypen(int num_letters, int count){
+    int i, num_hyphpen;
+    num_hyphpen = count + count - 1;
+    printf("%d ",num_letters+1);
+    for (i=0;i<num_hyphpen;i++){
+        printf("-");
+    }
+    printf("\n");
 }
 
 /*
