@@ -35,8 +35,8 @@
 (define (test-lambda)
     (define exp (list 'application 
                       (list 'lambda (list 'x) 'x)
-                      'a))
-    (define env (list (cons (list 'a) (list 1))))
+                      (list 'a)))
+    (define env '())
     (eq? (eval exp env)
          'a))
 

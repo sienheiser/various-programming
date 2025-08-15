@@ -33,7 +33,7 @@
 
 
 (define (make-procedure args body env)
-  '(procedure args body env))
+  (list 'procedure args body env))
 (define (procedure-parameters p) (cadr p))
 (define (procedure-args exp) (cadr exp))
 (define (procedure-body exp) (caddr exp))
@@ -41,6 +41,8 @@
 
 (define (eval-sequence exps env)
   (cond ((last-exp? exps)
+          (display "here")
+          (display "\n")
           (eval (first-exp exps) env))
         (else
           (eval (first-exp exps) env)
