@@ -9,11 +9,15 @@
 char getop(char s[]);
 void push(double f);
 double pop(void);
+void prtop(void);
+void duplicate(double temp[]);
+void swap(void);
 
 int main()
 {
     char type,s[MAXOP];
-    double op2;
+    double op2,temp[MAXOP];
+
     
     while((type = getop(s)) != EOF)
     {
@@ -39,6 +43,19 @@ int main()
                     printf("Error divisor is 0");
                 }
                 break;
+            case '%':
+                op2 = pop();
+                if (op2 != 0){
+                    push((int)pop() % (int)op2);
+                } else {
+                  printf("Error divisor is 0");
+                }
+            case 'p':
+                prtop();
+            case 's':
+                swap();
+            case 'd':
+                duplicate(temp);
             case '\n':
                 printf("\t%.8g\n", pop());
                 break;
@@ -73,6 +90,38 @@ double pop(void)
         return 0.0;
     }
 }
+
+void prtop(void)
+{
+    printf("Top of stack:");
+    int i;
+    for (i=0;i<sp;i++)
+    {
+      printf(" %g",val[i]);
+    }
+    printf("\n");
+}
+
+void duplicate(double t[])
+{
+    int i;
+    for (i = 0; i < sp; i++)
+    {
+        t[i] = val[i];
+    }
+}
+void swap(void)
+{
+    double t; 
+    if (sp > 1){
+        t = val[0];
+        val[0] = val[1];
+        val[1] = t;
+    } else {
+        printf("Cannot swap first two elements since there are less than 2\n");
+    }
+}
+
 
 char getch(void);
 void ungetch(char);
