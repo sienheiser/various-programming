@@ -1,56 +1,48 @@
 #include <stdio.h>
-#define NUMBER '0'
 
-//Max operand size
-#define MAXOP 100
-#define BUFSIZ 100
+// intput space are stings of instructions like 1 2 + 5 9 + + which means (1+2) + (5+9).
+// The operators must be binary operators. We can have integers and decimals.
+// Behaviour of compiled code is
+// a.out < "1 2 + 5 9 + +" writes 17 to the terminal.
+// Generally a.out < "a1 a2 op1 a3 a4 op2 op3" = (a1 op1 a2) op3 (a3 op2 a4)
 
-char read_instruc(char s[]);
-void push(double f);
-double pop(void);
-void prtop(void);
-void swap(void);
-void duplicate(double temp[]);
+char gethead(char s[]);
 int main()
 {
-    double op2,temp[BUFSIZ];
-    char type,s[MAXOP];
-    while ((type = read_instruc(s)) != EOF)
+    while ((type = gethead(s)) != EOF)
     {
-        switch (type)
-        {
+        switch (type){
             case NUMBER:
                 push(atof(s));
-                break;
             case '+':
                 push(pop()+pop());
-                break;
-            case '*':
-                push(pop()*pop());
                 break;
             case '-':
                 op2 = pop();
                 push(pop()-op2);
                 break;
+            case '*':
+                push(pop()*pop());
+                break;
             case '/':
                 op2 = pop();
-                if (op2 != 0){
-                    push(pop()/op2);
-                } else {
-                    printf("Error divisor is 0");
+                if (op2 != 0)
+                {
+                    printf("Division by zero error\n");
                 }
                 break;
-            case 'p':
-                prtop();
-            case 's':
-                swap();
+            case '%':
+                break;
+            case '^':
+                break;
             case 'd':
-                duplicate(temp);
-            case '\n':
-                printf("\t%.8g\n", pop());
+                break;
+            case 'p':
+                break;
+            case 's':
                 break;
             default:
-                printf("error: unknown command %s\n", s);
+                printf("Cannot interpret %s",s);
                 break;
         }
     }
