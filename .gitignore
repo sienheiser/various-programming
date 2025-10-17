@@ -4,3 +4,7 @@ __pycache__
 sim_build
 *.vcd
 *.toolbox
+testbench*
+*.out
+*.gch
+*.txt
