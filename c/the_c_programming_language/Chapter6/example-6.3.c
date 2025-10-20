@@ -1,3 +1,4 @@
+#include <stdio.h>
 //Input C code into program and count the amount of times 
 //C keywords are used.
 
@@ -8,13 +9,13 @@ struct keytab {
   int count;
 };
 
-char *get_word(char *word,int word_len);
-int binsearch(char *word, struct keytab *key, int num_key_words);
-void print_keys(struct keytab *keys,int num_key_words);
+char get_word(char *word, int max_len);
+int binsearch(char *word, struct keytab *key, int arr_len);
+void print_keytab(struct keytab key);
 
 int main(){
-  int num_key_words = 6
-  struct keytab keys[num_key_words] = {
+  int num_key_words = 6;
+  struct keytab keys[] = {
     "key1",0,
     "key2",0,
     "key3",0,
@@ -22,18 +23,54 @@ int main(){
     "key5",0,
     "key6",0,
   };
-  while (get_word(word,MAXLEN)) != EOF){
-    key_index = binsearch(word,keys,num_key_words);
-    if (key_index != -1)
-      keys[key_index].count++;
+  char word[MAXLEN];
+  int binsearch_result;
+  printf("Here1\n");
+  while (get_word(word,MAXLEN) != EOF){
+    printf("word = %s\n",word);
+    binsearch_result = binsearch(word,keys,num_key_words);
+    if (binsearch_result >= 0){
+      keys[binsearch_result].count++;
+    }
   }
 
-  print_keys(keys);
+  int i;
+  for (i = 0; i < num_key_words; i++){
+    print_keytab(keys[i]);
+  }
+}
+
+char get_word(char *word, int max_len){
+  char c;
+  int i;
+  for (i = 0; ((c = getchar()) != EOF || c != ' ' || c != '\n') && i < max_len; i++){
+    printf("%c",c);
+    word[i] = c;
+  }
+  word[i] = '\0';
+  return c;
+}
+
+int binsearch(char *word, struct keytab *key, int arr_len){
+  int low, mid, high;
+  low = 0;
+  high = arr_len;
+  mid = (low+high)/2;
+
+  while (low >= high){
+    if (word < key[mid].key){
+      high = mid;
+      mid = (low+high)/2;
+    } else if (word > key[mid].key){
+      low = mid;
+      mid = (low+high)/2;
+    } else
+      return mid;
+  return 0; 
+  }
 }
 
 
-char *get_word(char *word, int word_len){
-  for (i = 0; i < word_len && c = getchar() && (c != '\n' || c != ' ');i++)
-    word[i] = c;
-  word[i] = '\0';
+void print_keytab(struct keytab key){
+  printf("key = %s, count = %d\n",key.key,key.count);
 }
