@@ -36,7 +36,9 @@ Next == \/ FillSmall
         \/ SmallToBig
         \/ BigToSmall
 
+Spec == Init /\ [][Next]_<<small,big>>
+
 =============================================================================
 \* Modification History
-\* Last modified Mon Sep 16 08:10:33 CEST 2024 by emmanueldcosta
+\* Last modified Tue May 05 13:17:22 CEST 2026 by emmanueldcosta
 \* Created Mon Sep 16 07:45:01 CEST 2024 by emmanueldcosta
