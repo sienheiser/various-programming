@@ -8,3 +8,7 @@ testbench*
 *.out
 *.gch
 *.txt
+*.o
+*.vcd
+*.pdf
+*.json

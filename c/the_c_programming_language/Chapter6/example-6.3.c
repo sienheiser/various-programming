@@ -42,8 +42,11 @@ int main(){
 
 char get_word(char *word, int max_len){
   char c;
+  while ((c = getchar()) == ' ' || c == '\n');
   int i;
-  for (i = 0; ((c = getchar()) != EOF || c != ' ' || c != '\n') && i < max_len; i++){
+  i = 0;
+  word[i] = c;
+  for (i = 1; ((c = getchar()) != EOF || c != ' ' || c != '\n') && i < max_len; i++){
     printf("%c",c);
     word[i] = c;
   }
