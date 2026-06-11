@@ -1,0 +1,42 @@
+-------------------------------- MODULE FIFO --------------------------------
+EXTENDS Naturals, Sequences
+CONSTANT Message
+VARIABLES in, out, q
+
+InChan == INSTANCE Channel WITH Data <- Message, chan <- in
+OutChan == INSTANCE Channel WITH Data <- Message, chan <- out
+
+TypeInvariant == /\ InChan!TypeInvariant
+                 /\ OutChan!TypeInvariant
+                 /\ q \in Seq(Message)
+
+Init == /\ InChan!Init
+        /\ OutChan!Init
+        /\ q \in Seq(Message)
+        
+SSend(msg) == /\ InChan!Send(msg)
+              /\ UNCHANGED <<out,q>>
+
+BRcv == /\ InChan!Receive
+        /\ q' = Append(q,in.val)
+        /\ UNCHANGED out
+
+BSend == /\ q /= <<>>
+         /\ OutChan!Send(Head(q))
+         /\ q' = Tail(q)
+         /\ UNCHANGED in
+
+RRcv == /\ OutChan!Receive
+        /\ UNCHANGED <<in,q>>
+
+Next == \/ (\exists msg \in Message : SSend(msg))
+        \/ BRcv
+        \/ BSend
+        \/ RRcv
+
+Spec == Init /\ [][Next]_<<in,out,q>>
+
+=============================================================================
+\* Modification History
+\* Last modified Tue May 19 14:09:21 CEST 2026 by emmanueldcosta
+\* Created Wed Jan 21 15:02:00 CET 2026 by emmanueldcosta
